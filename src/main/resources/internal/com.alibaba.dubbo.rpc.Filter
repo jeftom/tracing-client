@@ -1,0 +1,1 @@
+zipkin=com.bdfint.bdtrace.ZipkinFilter
