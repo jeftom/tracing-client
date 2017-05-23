@@ -1,5 +1,8 @@
 package com.bdfint.bdtrace.support;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Properties;
 
@@ -9,14 +12,14 @@ import java.util.Properties;
  * @desriptioin
  */
 public class Configuration {
+    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+    private static final String SAMPLER = "sampler";
+    private static final String HOST = "domain";
     static String zipkinUrlHead = "http://";
     static String zipkinHost = "127.0.0.1";
     static String zipkinPort = ":9411";
     static String zipkinUrlTail = "/api/v1/spans/";
     static String zipkinUrl = "http://" + zipkinHost + "/api/v1/spans/";
-
-
-    static final String HOST = "domain";
 
     /**
      * get url from client
@@ -24,14 +27,24 @@ public class Configuration {
      * @return zipkin url where to send tracing data
      */
     public static String getZipkinUrl() {
+        zipkinHost = getProperty(HOST);
+        return zipkinUrl();
+    }
+
+    /**
+     * get property from file named zipkin.properties under <b>resources</b>
+     *
+     * @param key
+     * @return
+     */
+    public static String getProperty(String key) {
         Properties prop = new Properties();
         try {
             prop.load(Configuration.class.getClassLoader().getResourceAsStream("zipkin.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        zipkinHost = prop.getProperty(HOST);
-        return zipkinUrl();
+        return prop.getProperty(key);
     }
 
     private static String zipkinUrl() {
@@ -40,7 +53,8 @@ public class Configuration {
 
     public static void main(String[] args) throws IOException {
 
-        System.out.println(getZipkinUrl());
+        logger.info(getZipkinUrl());
+//        logger.info(getSampler());
     }
 
     /**
@@ -49,8 +63,11 @@ public class Configuration {
      * @return
      */
     public static float getSampler() {
-        //TODO
+        String p = getProperty(SAMPLER);
+        float sampler = Float.valueOf(p);
+        logger.info("tracing-client的采样率为：{}", p);
 
-        return 1F;
+//        return 1F;
+        return sampler;
     }
 }

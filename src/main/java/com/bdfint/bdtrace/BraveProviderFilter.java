@@ -10,11 +10,14 @@ import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.support.AbstractDubboFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 @Activate(group = {Constants.PROVIDER})
 public class BraveProviderFilter extends AbstractDubboFilter {
+    private static final Logger logger = LoggerFactory.getLogger(BraveProviderFilter.class);
 
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         IgnoreFilter ingoreFilter = new IgnoreFilter(invoker, invocation).invoke();
@@ -24,7 +27,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
 
         setInterceptors(interfaceName);
 
-        System.out.println(interfaceName + " provider execute");
+        logger.info(interfaceName + " provider execute");
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), interfaceName);
 
@@ -35,9 +38,9 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         try {
             result = invoker.invoke(invocation);
             if (result.hasException()) {
-                System.out.println("======================Exception=====================");
+                logger.info("======================Exception=====================");
                 msg = Arrays.toString(result.getException().getStackTrace());
-                System.out.println(interfaceName + "," + this + "," + System.currentTimeMillis());
+                logger.info(interfaceName + "," + this + "," + System.currentTimeMillis());
                 status = StatusEnum.ERROR;
             }
         } catch (RpcException e) {

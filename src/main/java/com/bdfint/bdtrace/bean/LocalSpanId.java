@@ -1,4 +1,4 @@
-package com.bdfint.bdtrace;
+package com.bdfint.bdtrace.bean;
 
 import com.github.kristofa.brave.SpanId;
 

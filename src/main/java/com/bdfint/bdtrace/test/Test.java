@@ -1,5 +1,8 @@
 package com.bdfint.bdtrace.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,6 +12,7 @@ import java.util.Set;
  * @desriptioin
  */
 public class Test {
+    private static final Logger logger = LoggerFactory.getLogger(Test.class);
 
     static class Entry {
         final String parent;
@@ -52,9 +56,9 @@ public class Test {
 
     public static void testForParentChildrenRelationship(String parent, String child) {
         if (!relationship.contains(new Entry(parent, child))) {
-            System.out.println("=================ERROR===================");
-            System.out.println(String.format("parent is <<%s>>,child is <<%s>>", parent, child));
-            System.out.println("=================ERROR===================");
+            logger.info("=================ERROR===================");
+            logger.info(String.format("parent is <<%s>>,child is <<%s>>", parent, child));
+            logger.info("=================ERROR===================");
         }
     }
 

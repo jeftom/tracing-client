@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="logPath" value="./logs"/>
+    <property name="logLevel" value="INFO"/>
+    <property name="outPattern" value="[%-5p] %d{yyyy-MM-dd HH:mm:ss.SSS} [tracing-client][%t] [%logger{16}] - %m%n" />
+    <property name="maxHistory" value="7" />
+    <property name="charSet" value="UTF-8" />
+
+    <!-- 普通日志 -->
+    <appender name="APP_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/tracing-client.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logPath}/tracing-client.log.%d{yyyy-MM-dd}</FileNamePattern>
+            <maxHistory>${maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${outPattern}</Pattern>
+            <charset>${charSet}</charset>
+        </encoder>
+    </appender>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${outPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.bdfint.tracing-client" level="${logLevel}" additivity="true">
+        <appender-ref ref="APP_LOG_FILE" />
+    </logger>
+
+    <root level="${logLevel}">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="APP_LOG_FILE" />
+    </root>
+
+</configuration>

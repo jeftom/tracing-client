@@ -13,12 +13,15 @@ import com.bdfint.bdtrace.support.AbstractDubboFilter;
 import com.github.kristofa.brave.ClientRequestInterceptor;
 import com.github.kristofa.brave.ClientTracer;
 import com.github.kristofa.brave.SpanId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
 @Activate(group = {Constants.CONSUMER})
 public class BraveConsumerFilter extends AbstractDubboFilter {
+    private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
 
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         IgnoreFilter ingoreFilter = new IgnoreFilter(invoker, invocation).invoke();
@@ -29,7 +32,7 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
         SpanId spanId = null;
 
         setInterceptors(interfaceName);
-        System.out.println(interfaceName + " consumer execute");
+        logger.info(interfaceName + " consumer execute");
         DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), interfaceName);
         spanId = newSpanId(interfaceName, clientRequestAdapter);
         getParentServiceNameAndSetBrave(interfaceName, spanId);
@@ -42,10 +45,10 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
         try {
             result = invoker.invoke(invocation);
             if (result.hasException()) {
-                System.out.println("======================Exception=====================");
+                logger.info("======================Exception=====================");
                 result.getException().printStackTrace();
                 msg = Arrays.toString(result.getException().getStackTrace());
-                System.out.println(interfaceName + "," + this + "," + System.currentTimeMillis());
+                logger.info(interfaceName + "," + this + "," + System.currentTimeMillis());
                 status = StatusEnum.ERROR;
             }
         } catch (RpcException e) {
