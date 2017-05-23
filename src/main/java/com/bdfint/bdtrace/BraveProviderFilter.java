@@ -1,0 +1,54 @@
+package com.bdfint.bdtrace;
+
+import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.extension.Activate;
+import com.alibaba.dubbo.rpc.Invocation;
+import com.alibaba.dubbo.rpc.Invoker;
+import com.alibaba.dubbo.rpc.Result;
+import com.alibaba.dubbo.rpc.RpcException;
+import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
+import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
+import com.bdfint.bdtrace.bean.StatusEnum;
+import com.bdfint.bdtrace.support.AbstractDubboFilter;
+
+import java.util.Arrays;
+
+@Activate(group = {Constants.PROVIDER})
+public class BraveProviderFilter extends AbstractDubboFilter {
+
+    public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        IgnoreFilter ingoreFilter = new IgnoreFilter(invoker, invocation).invoke();
+        if (ingoreFilter.is()) return invoker.invoke(invocation);
+        String interfaceName = ingoreFilter.getInterfaceName();
+        StatusEnum status = ingoreFilter.getStatus();
+
+        setInterceptors(interfaceName);
+
+        System.out.println(interfaceName + " provider execute");
+
+        DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), interfaceName);
+
+        setParentServiceName(interfaceName, dubboServerRequestAdapter);
+        serverRequestInterceptor.handle(dubboServerRequestAdapter);
+        Result result = null;
+        String msg = null;
+        try {
+            result = invoker.invoke(invocation);
+            if (result.hasException()) {
+                System.out.println("======================Exception=====================");
+                msg = Arrays.toString(result.getException().getStackTrace());
+                System.out.println(interfaceName + "," + this + "," + System.currentTimeMillis());
+                status = StatusEnum.ERROR;
+            }
+        } catch (RpcException e) {
+            status = StatusEnum.ERROR;
+            msg = Arrays.toString(e.getStackTrace());
+            throw new RuntimeException(e.getCause());
+        } finally {
+            serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, msg, System.currentTimeMillis()));
+            return result;
+        }
+    }
+
+
+}

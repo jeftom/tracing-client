@@ -1,0 +1,2 @@
+braveProviderFilter=com.bdfint.bdtrace.BraveProviderFilter
+braveConsumerFilter=com.bdfint.bdtrace.BraveConsumerFilter
