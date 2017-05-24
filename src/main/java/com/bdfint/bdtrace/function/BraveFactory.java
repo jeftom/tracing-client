@@ -22,6 +22,7 @@ public class BraveFactory {
     private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
     private static Sampler sSampler = new BraveFactory().sampler;
     private static Map<String, Brave> cache = new HashMap<String, Brave>();
+
     private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
     private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
     private final Sampler sampler = Sampler.create(Configuration.getSampler());

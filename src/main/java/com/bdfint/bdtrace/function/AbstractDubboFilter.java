@@ -2,16 +2,12 @@ package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
-import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
-import com.bdfint.bdtrace.functionable.Annotated;
-import com.bdfint.bdtrace.functionable.IAttachmentTransmittable;
+import com.bdfint.bdtrace.functionable.*;
 import com.github.kristofa.brave.*;
-import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2017/5/18.
  * @desriptioin
  */
-public abstract class AbstractDubboFilter implements Filter {
+public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected static final ThreadLocal<Map<Long, LocalSpanId>> callTreeCache = new ThreadLocal<Map<Long, LocalSpanId>>() {
         @Override
         protected Map<Long, LocalSpanId> initialValue() {
@@ -31,19 +27,43 @@ public abstract class AbstractDubboFilter implements Filter {
         }
     };
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
-    static AtomicLong threadName = new AtomicLong(0);
-    protected StatusEnum status;
+    private static AtomicLong threadName = new AtomicLong(0);
     protected ClientRequestInterceptor clientRequestInterceptor;
     protected ClientResponseInterceptor clientResponseInterceptor;
     protected ServerRequestInterceptor serverRequestInterceptor;
     protected ServerResponseInterceptor serverResponseInterceptor;
     protected Annotated annotated = new AnnotatedImpl();
-    @Autowired
+    protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
+    protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
+    protected StatusEnum status = StatusEnum.OK;
+    protected String serviceName;
     protected IAttachmentTransmittable transmitter;
-    LocalSpanThreadBinder spanThreadBinder;
-    private Brave brave = null;
+    protected Brave brave = null;
+    protected String errMsg = null;
 
-    public abstract Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException;
+    public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
+        //ignore this trace when sample is 0 or null
+        if (noneTraceBehaviors.ignoreTrace(invoker, invocation))
+            return invoker.invoke(invocation);
+
+        //template method
+        if (preHandle(invoker, invocation)) {
+            return invoker.invoke(invocation);
+        }
+
+        Result result = null;
+        try {
+            result = invoker.invoke(invocation);
+            errMsg = handleException(result, serviceName); //template method
+        } catch (RpcException e) {
+            status = StatusEnum.ERROR;
+            errMsg = Arrays.toString(e.getStackTrace());
+            throw new RuntimeException(e.getCause());
+        } finally {
+            afterHandle();//template method
+            return result;
+        }
+    }
 
     protected void setParentServiceName(String interfaceName, DubboServerRequestAdapter dubboServerRequestAdapter) {
         SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
@@ -104,54 +124,4 @@ public abstract class AbstractDubboFilter implements Filter {
         return msg;
     }
 
-    protected class IgnoreFilter {
-        private boolean myResult;
-        private Invoker<?> invoker;
-        private Invocation invocation;
-        private String interfaceName;
-        private StatusEnum status;
-
-        public IgnoreFilter(Invoker<?> invoker, Invocation invocation) {
-            this.invoker = invoker;
-            this.invocation = invocation;
-        }
-
-        public boolean is() {
-            return myResult;
-        }
-
-        public String getInterfaceName() {
-            return interfaceName;
-        }
-
-        public StatusEnum getStatus() {
-            return status;
-        }
-
-        public IgnoreFilter invoke() {
-    /* * 监控的 dubbo 服务，不纳入跟踪范围
-     */
-            if ("com.alibaba.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
-                myResult = true;
-                return this;
-            }
-        /*
-         * 调用的方法名 以此作为 span name
-         */
-            interfaceName = invoker.getInterface().getSimpleName() + "." + invocation.getMethodName();
-//        interfaceName = interfaceName + (context.isConsumerSide() ? ".consumer" : ".provider");
-        /*
-         * provider 应用相关信息
-         */
-            status = StatusEnum.OK;
-            if ("0".equals(invocation.getAttachment(DubboTraceConst.SAMPLED))
-                    || "false".equals(invocation.getAttachment(DubboTraceConst.SAMPLED))) {
-                myResult = true;
-                return this;
-            }
-
-            myResult = false;
-            return this;
-        }
-    }
 }
