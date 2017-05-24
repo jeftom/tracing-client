@@ -7,7 +7,6 @@ import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.github.kristofa.brave.*;
-import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @desriptioin
  */
 public abstract class AbstractDubboFilter implements Filter {
-    protected StatusEnum status;
     protected static final ThreadLocal<Map<Long, LocalSpanId>> callTreeCache = new ThreadLocal<Map<Long, LocalSpanId>>() {
         @Override
         protected Map<Long, LocalSpanId> initialValue() {
@@ -32,6 +30,7 @@ public abstract class AbstractDubboFilter implements Filter {
     };
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
     static AtomicLong threadName = new AtomicLong(0);
+    protected StatusEnum status;
     protected ClientRequestInterceptor clientRequestInterceptor;
     protected ClientResponseInterceptor clientResponseInterceptor;
     protected ServerRequestInterceptor serverRequestInterceptor;
@@ -60,7 +59,8 @@ public abstract class AbstractDubboFilter implements Filter {
 
     protected void getParentServiceNameAndSetBrave(String interfaceName, SpanId spanId) {
         if (callTreeCache.get().size() == 0) {
-            logger.info("WARNING when get parent service name");
+            if (spanId.nullableParentId() != null)
+                logger.error("WARNING when get parent service name");
         } else {
             LocalSpanId localSpanId = callTreeCache.get().get(spanId.parentId);//获取父节点缓存，为了使当前节点接收父节点的依赖
 //            logger.info(Thread.currentThread() + "<=>" + localSpanId.getCurrentThread());
