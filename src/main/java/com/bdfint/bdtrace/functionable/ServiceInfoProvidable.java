@@ -5,7 +5,7 @@ package com.bdfint.bdtrace.functionable;
  * @date 2017/5/18.
  * @desriptioin 需要上下文环境中调用
  */
-public interface ConsumerInfoProvidable {
+public interface ServiceInfoProvidable extends SpanNameProvidable {
 
     /**
      * 获取应用名
@@ -26,6 +26,13 @@ public interface ConsumerInfoProvidable {
      *
      * @return
      */
-    String clientAddress();
+    String consumerAddress();
+
+    /**
+     * 获取provider 地址
+     *
+     * @return
+     */
+    String providerAddress();
 
 }
