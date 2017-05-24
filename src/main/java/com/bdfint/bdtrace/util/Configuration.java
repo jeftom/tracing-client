@@ -1,4 +1,4 @@
-package com.bdfint.bdtrace.support;
+package com.bdfint.bdtrace.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ public class Configuration {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
     private static final String SAMPLER = "sampler";
     private static final String HOST = "domain";
+
     static String zipkinUrlHead = "http://";
     static String zipkinHost = "127.0.0.1";
     static String zipkinPort = ":9411";
@@ -42,7 +43,7 @@ public class Configuration {
         try {
             prop.load(Configuration.class.getClassLoader().getResourceAsStream("zipkin.properties"));
         } catch (IOException e) {
-            logger.info("异常信息：",e);
+            logger.info("异常信息：", e);
         }
         return prop.getProperty(key);
     }

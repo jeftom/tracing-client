@@ -1,5 +1,6 @@
-package com.bdfint.bdtrace.support;
+package com.bdfint.bdtrace.function;
 
+import com.bdfint.bdtrace.util.Configuration;
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.Sampler;
 import org.slf4j.Logger;

@@ -9,7 +9,7 @@ import com.alibaba.dubbo.rpc.RpcException;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
-import com.bdfint.bdtrace.support.AbstractDubboFilter;
+import com.bdfint.bdtrace.function.AbstractDubboFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

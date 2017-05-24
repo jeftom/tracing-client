@@ -1,10 +1,10 @@
-package com.bdfint.bdtrace;
+package com.bdfint.bdtrace.function;
 
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
-import com.bdfint.bdtrace.support.Annotated;
+import com.bdfint.bdtrace.functionable.Annotated;
 import zipkin.Annotation;
 import zipkin.Endpoint;
 

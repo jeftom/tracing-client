@@ -1,4 +1,4 @@
-package com.bdfint.bdtrace.support;
+package com.bdfint.bdtrace.functionable;
 
 import zipkin.Annotation;
 

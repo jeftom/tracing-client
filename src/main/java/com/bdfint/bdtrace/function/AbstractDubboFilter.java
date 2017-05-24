@@ -1,11 +1,12 @@
-package com.bdfint.bdtrace.support;
+package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
-import com.bdfint.bdtrace.AnnotatedImpl;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
+import com.bdfint.bdtrace.functionable.Annotated;
+import com.bdfint.bdtrace.functionable.IAttachmentTransmittable;
 import com.github.kristofa.brave.*;
 import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
@@ -23,7 +24,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @desriptioin
  */
 public abstract class AbstractDubboFilter implements Filter {
-    protected StatusEnum status;
     protected static final ThreadLocal<Map<Long, LocalSpanId>> callTreeCache = new ThreadLocal<Map<Long, LocalSpanId>>() {
         @Override
         protected Map<Long, LocalSpanId> initialValue() {
@@ -32,6 +32,7 @@ public abstract class AbstractDubboFilter implements Filter {
     };
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
     static AtomicLong threadName = new AtomicLong(0);
+    protected StatusEnum status;
     protected ClientRequestInterceptor clientRequestInterceptor;
     protected ClientResponseInterceptor clientResponseInterceptor;
     protected ServerRequestInterceptor serverRequestInterceptor;
@@ -128,8 +129,7 @@ public abstract class AbstractDubboFilter implements Filter {
         }
 
         public IgnoreFilter invoke() {
-    /*
-     * 监控的 dubbo 服务，不纳入跟踪范围
+    /* * 监控的 dubbo 服务，不纳入跟踪范围
      */
             if ("com.alibaba.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
                 myResult = true;

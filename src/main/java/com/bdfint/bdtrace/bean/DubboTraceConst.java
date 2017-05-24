@@ -22,9 +22,11 @@ public interface DubboTraceConst {
 
     String SPAN_NAME = "dubbo.trace.span_name";
 
-
     String CLIENT_TO_SERVER_ELAPSE = "c2s_elapse";
+
     String REMOTE_METHOD_CALL_ELAPSE = "method_elapse";
+
     String SERVER_TO_CLIENT_ELAPSE = "s2c_elapse";
+
     String WHOLE_ELAPSE = "whole_elapse";
 }
