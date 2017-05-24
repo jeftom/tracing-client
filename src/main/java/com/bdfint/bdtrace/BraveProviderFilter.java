@@ -23,11 +23,11 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         IgnoreFilter ingoreFilter = new IgnoreFilter(invoker, invocation).invoke();
         if (ingoreFilter.is()) return invoker.invoke(invocation);
         String interfaceName = ingoreFilter.getInterfaceName();
-        StatusEnum status = ingoreFilter.getStatus();
+        status = ingoreFilter.getStatus();
 
         setInterceptors(interfaceName);
 
-        logger.info(interfaceName + " provider execute");
+        logger.debug(interfaceName + " provider execute");
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), interfaceName);
 
@@ -37,12 +37,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         String msg = null;
         try {
             result = invoker.invoke(invocation);
-            if (result.hasException()) {
-                logger.info("======================Exception=====================");
-                msg = Arrays.toString(result.getException().getStackTrace());
-                logger.info(interfaceName + "," + this + "," + System.currentTimeMillis());
-                status = StatusEnum.ERROR;
-            }
+            msg = handleException(result, interfaceName);
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
             msg = Arrays.toString(e.getStackTrace());

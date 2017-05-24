@@ -22,35 +22,31 @@ import java.util.Arrays;
 @Activate(group = {Constants.CONSUMER})
 public class BraveConsumerFilter extends AbstractDubboFilter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
+    String interfaceName;
+    SpanId spanId = null;
 
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        IgnoreFilter ingoreFilter = new IgnoreFilter(invoker, invocation).invoke();
-        if (ingoreFilter.is())
+        IgnoreFilter ignoreFilter = new IgnoreFilter(invoker, invocation).invoke();
+        if (ignoreFilter.is())
             return invoker.invoke(invocation);
-        String interfaceName = ingoreFilter.getInterfaceName();
-        StatusEnum status = ingoreFilter.getStatus();
-        SpanId spanId = null;
+        interfaceName = ignoreFilter.getInterfaceName();
+        status = ignoreFilter.getStatus();
 
         setInterceptors(interfaceName);
-        logger.info(interfaceName + " consumer execute");
+        logger.debug(interfaceName + " consumer execute");
         DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), interfaceName);
-        spanId = newSpanId(interfaceName, clientRequestAdapter);
+        spanId = newNullableSpanId(clientRequestAdapter);
+        if (spanId == null)
+            return invoker.invoke(invocation);
         getParentServiceNameAndSetBrave(interfaceName, spanId);
         clientRequestInterceptor.handle(clientRequestAdapter);
 
-        //
         annotated.clientSent(interfaceName, clientRequestAdapter);
         Result result = null;
         String msg = null;
         try {
             result = invoker.invoke(invocation);
-            if (result.hasException()) {
-                logger.info("======================Exception=====================");
-                result.getException().printStackTrace();
-                msg = Arrays.toString(result.getException().getStackTrace());
-                logger.info(interfaceName + "," + this + "," + System.currentTimeMillis());
-                status = StatusEnum.ERROR;
-            }
+            msg = handleException(result, interfaceName);
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
             msg = Arrays.toString(e.getStackTrace());
@@ -62,20 +58,25 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
         }
     }
 
-    private SpanId newSpanId(String interfaceName, DubboClientRequestAdapter clientRequestAdapter) {
+
+    /**
+     * 反射获取tracer并new spanId
+     *
+     * @param clientRequestAdapter
+     * @return
+     */
+    private SpanId newNullableSpanId(DubboClientRequestAdapter clientRequestAdapter) {
         SpanId spanId;
         try {
             Field field = ClientRequestInterceptor.class.getDeclaredField("clientTracer");
             field.setAccessible(true);
             ClientTracer clientTracer = (ClientTracer) field.get(clientRequestInterceptor);
-            spanId = clientTracer.startNewSpan(clientRequestAdapter.getSpanName());
-            if (spanId == null)
-                throw new NullPointerException("======spanId is null======");
+            spanId = clientTracer.startNewSpan(clientRequestAdapter.getSpanName());//may be null
             return spanId;
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            logger.info("异常信息：", e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.info("异常信息：", e);
         }
         return null;
 

@@ -42,7 +42,7 @@ public class Configuration {
         try {
             prop.load(Configuration.class.getClassLoader().getResourceAsStream("zipkin.properties"));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info("异常信息：",e);
         }
         return prop.getProperty(key);
     }

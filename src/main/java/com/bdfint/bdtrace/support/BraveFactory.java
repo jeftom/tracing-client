@@ -2,6 +2,8 @@ package com.bdfint.bdtrace.support;
 
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.Sampler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import zipkin.reporter.AsyncReporter;
 import zipkin.reporter.Sender;
 import zipkin.reporter.okhttp3.OkHttpSender;
@@ -15,15 +17,13 @@ import java.util.Map;
  * @desriptioin
  */
 public class BraveFactory {
-    private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
-    private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
-    private final Sampler sampler = Sampler.create(Configuration.getSampler());
-//    private Brave brave;
-//    private BraveFactory factory = new BraveFactory();
-
+    private static final Logger logger = LoggerFactory.getLogger(BraveFactory.class);
     private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
     private static Sampler sSampler = new BraveFactory().sampler;
     private static Map<String, Brave> cache = new HashMap<String, Brave>();
+    private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
+    private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
+    private final Sampler sampler = Sampler.create(Configuration.getSampler());
 
     public static Brave nullableInstance(String serviceName) {
 
@@ -36,7 +36,7 @@ public class BraveFactory {
             if (brave != null)
                 cache.put(serviceName, brave);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info("异常信息：", e);
         } finally {
             return brave;
         }
