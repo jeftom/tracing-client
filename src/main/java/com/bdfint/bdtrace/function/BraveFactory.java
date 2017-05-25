@@ -3,6 +3,8 @@ package com.bdfint.bdtrace.function;
 import com.bdfint.bdtrace.util.Configuration;
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.Sampler;
+import org.junit.Assert;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import zipkin.reporter.AsyncReporter;
@@ -24,13 +26,13 @@ public class BraveFactory {
     private final static AsyncReporter<zipkin.Span> REPORTER = AsyncReporter.builder(SENDER).build();
     private final static Sampler SAMPLER = Sampler.create(Configuration.getSampler());
     //static
-    private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
-    private static Sampler sSampler = new BraveFactory().sampler;
+//    private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
+//    private static Sampler sSampler = new BraveFactory().sampler;
     private static Map<String, Brave> cache = new HashMap<String, Brave>();
     //field
-    private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
-    private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
-    private final Sampler sampler = Sampler.create(Configuration.getSampler());
+//    private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
+//    private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
+//    private final Sampler sampler = Sampler.create(Configuration.getSampler());
 
     public static Brave nullableInstance(String serviceName) {
 
@@ -47,5 +49,11 @@ public class BraveFactory {
         } finally {
             return brave;
         }
+    }
+
+    @Test
+    public void test(){
+        Brave brave = nullableInstance("hello-service");
+        Assert.assertNotNull(brave);
     }
 }
