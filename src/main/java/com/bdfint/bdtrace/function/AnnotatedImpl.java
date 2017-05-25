@@ -6,6 +6,7 @@ import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
 import com.bdfint.bdtrace.functionable.Annotated;
 import zipkin.Annotation;
+import zipkin.Constants;
 import zipkin.Endpoint;
 
 /**
@@ -35,8 +36,14 @@ public class AnnotatedImpl implements Annotated {
         return remote;
     }
 
+    /**
+     * MUST call after <B>cr!</B>
+     *
+     * @return
+     */
     public long s2cElapse() {
-        s2c = cr.timestamp - ss.timestamp;
+//        s2c = cr.timestamp - ss.timestamp;
+        s2c = whole - c2s - remote;
         return s2c;
     }
 
@@ -52,14 +59,31 @@ public class AnnotatedImpl implements Annotated {
     }
 
     public Annotation serverReceived(String interfaceName, DubboServerRequestAdapter serverRequestAdapter) {
-        return null;
+        Annotation annotation = Annotation.create(System.currentTimeMillis(), zipkin.Constants.SERVER_RECV, Endpoint.create(interfaceName, 0));
+        this.sr = annotation;
+        c2sElapse();
+        return annotation;
     }
 
+    /**
+     * lazy load?how?
+     *
+     * @param interfaceName
+     * @param serverResponseAdapter
+     * @return
+     */
     public Annotation serverSent(String interfaceName, DubboServerResponseAdapter serverResponseAdapter) {
-        return null;
+        Annotation annotation = Annotation.create(System.currentTimeMillis(), Constants.CLIENT_RECV, Endpoint.create(interfaceName, 0));
+        this.sr = annotation;
+        remoteElapse();
+        return annotation;
     }
 
     public Annotation clientReceived(String interfaceName, DubboClientResponseAdapter clientResponseAdapter) {
-        return null;
+        Annotation annotation = Annotation.create(System.currentTimeMillis(), Constants.CLIENT_RECV, Endpoint.create(interfaceName, 0));
+        this.sr = annotation;
+        wholeElapse();
+        s2cElapse();
+        return annotation;
     }
 }
