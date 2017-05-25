@@ -24,10 +24,6 @@ public class BraveProviderFilter extends AbstractDubboFilter {
 
     @Override
     public boolean preHandle(Invoker<?> invoker, Invocation invocation) {
-        serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
-        spanName = serviceInfoProvidable.spanName(invoker, invocation);
-        setInterceptors(serviceName);
-
         logger.debug(serviceName + " provider execute");
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);

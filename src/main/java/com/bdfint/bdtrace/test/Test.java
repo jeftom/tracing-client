@@ -9,7 +9,7 @@ import java.util.Set;
  * @desriptioin
  */
 public class Test {
-//    private static final Logger logger = LoggerFactory.getLogger(Test.class);
+    //    private static final Logger logger = LoggerFactory.getLogger(Test.class);
     private static Set<Entry> relationship = new HashSet<Entry>();
 
     static {
@@ -29,6 +29,12 @@ public class Test {
         }
     }
 
+    public static void testServiceName(String name) {
+        if (name.contains(".")) {
+            System.out.println("ERROR :" + name);
+        }
+    }
+
     public static void main(String[] args) {
 //        testForParentChildrenRelationship("BuyAB.buyAB", "BuyABB.buyAB");
 //        testForParentChildrenRelationship("BuyABB.buyAB", "BuyABB.buyAB");
@@ -43,6 +49,7 @@ public class Test {
             this.parent = parent;
             this.child = child;
         }
+
 
         @Override
         public boolean equals(Object o) {
@@ -61,7 +68,6 @@ public class Test {
             result = 31 * result + (child != null ? child.hashCode() : 0);
             return result;
         }
-
     }
 
 }

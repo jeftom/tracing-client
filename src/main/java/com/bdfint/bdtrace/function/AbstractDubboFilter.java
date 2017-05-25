@@ -4,6 +4,7 @@ import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.functionable.*;
+import com.bdfint.bdtrace.test.Test;
 import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @desriptioin
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
+    /**
+     * cache for parent service
+     */
     protected static final ThreadLocal<Map<Long, LocalSpanId>> callTreeCache = new ThreadLocal<Map<Long, LocalSpanId>>() {
         @Override
         protected Map<Long, LocalSpanId> initialValue() {
@@ -27,18 +31,23 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     };
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
     private static AtomicLong threadName = new AtomicLong(0);
+    // brave and interceptors
+    protected Brave brave = null;
     protected ClientRequestInterceptor clientRequestInterceptor;
     protected ClientResponseInterceptor clientResponseInterceptor;
     protected ServerRequestInterceptor serverRequestInterceptor;
     protected ServerResponseInterceptor serverResponseInterceptor;
+
+    // interface dependencies and impl.
     protected Annotated annotated = new AnnotatedImpl();
     protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
+    protected IAttachmentTransmittable transmitter;
+
+    //field
     protected StatusEnum status = StatusEnum.OK;
     protected String serviceName;
     protected String spanName;
-    protected IAttachmentTransmittable transmitter;
-    protected Brave brave = null;
     protected String errMsg = null;
 
     @Override
@@ -46,6 +55,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
         spanName = serviceInfoProvidable.spanName(invoker, invocation);
         setInterceptors(serviceName);
+        Test.testServiceName(serviceName);
     }
 
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
@@ -60,7 +70,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         if (preHandle(invoker, invocation)) {
             return invoker.invoke(invocation);
         }
-
+        Test.testServiceName(serviceName);
         Result result = null;
         try {
             result = invoker.invoke(invocation);
@@ -71,6 +81,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             throw new RuntimeException(e.getCause());
         } finally {
             afterHandle();//template method
+            Test.testServiceName(serviceName);
             return result;
         }
     }
@@ -122,14 +133,14 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
      * @param result
      * @return
      */
-    public String handleException(Result result, String interfaceName) {
+    public String handleException(Result result, String serviceName) {
         String msg = null;
         if (result.hasException()) {
             logger.warn("======================Exception=====================");
 //                result.getException().printStackTrace();
             msg = Arrays.toString(result.getException().getStackTrace());
-            logger.warn("serviceName: {}, class: {}", interfaceName, this);
-            logger.warn("");
+            logger.warn("serviceName: {}, class: {}", serviceName, this);
+            logger.warn("Exception info {}", result.getException());
             status = StatusEnum.ERROR;
         }
         return msg;
