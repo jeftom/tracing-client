@@ -14,19 +14,19 @@ public interface DubboTraceConst {
 
     String TRACE_ID = "dubbo.trace.traceId";
 
-    String SERVER_RESPONSE_STATUS_CODE = "ser_resp.stat";
+    String SERVER_RESPONSE_STATUS_CODE = "provider响应状态";
 
-    String CLIENT_RESPONSE_STATUS_CODE = "cli_resp.stat";
+    String CLIENT_RESPONSE_STATUS_CODE = "consumer响应状态";
 
-    String EXCEPTION_MESSAGE = "excp_msg";
+    String EXCEPTION_MESSAGE = "异常信息";
 
     String SPAN_NAME = "dubbo.trace.span_name";
 
-    String CLIENT_TO_SERVER_ELAPSE = "c2s_elapse";
+    String CLIENT_TO_SERVER_ELAPSE = "c-s网络耗时";
 
-    String REMOTE_METHOD_CALL_ELAPSE = "method_elapse";
+    String REMOTE_METHOD_CALL_ELAPSE = "远程方法耗时";
 
-    String SERVER_TO_CLIENT_ELAPSE = "s2c_elapse";
+    String SERVER_TO_CLIENT_ELAPSE = "s-c网络耗时";
 
-    String WHOLE_ELAPSE = "whole_elapse";
+    String WHOLE_ELAPSE = "总耗时";
 }

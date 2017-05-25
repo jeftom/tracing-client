@@ -25,22 +25,22 @@ public class AnnotatedImpl implements Annotated {
     long whole = 0L;
 
 
-    public long getC2s() {
+    public long c2sElapse() {
         c2s = sr.timestamp - cs.timestamp;
         return c2s;
     }
 
-    public long getRemote() {
+    public long remoteElapse() {
         remote = ss.timestamp - sr.timestamp;
         return remote;
     }
 
-    public long getS2c() {
+    public long s2cElapse() {
         s2c = cr.timestamp - ss.timestamp;
         return s2c;
     }
 
-    public long getWhole() {
+    public long wholeElapse() {
         whole = cr.timestamp - cs.timestamp;
         return whole;
     }

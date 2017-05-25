@@ -1,7 +1,6 @@
 package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
-import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.functionable.*;
@@ -37,14 +36,25 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
     protected StatusEnum status = StatusEnum.OK;
     protected String serviceName;
+    protected String spanName;
     protected IAttachmentTransmittable transmitter;
     protected Brave brave = null;
     protected String errMsg = null;
+
+    @Override
+    public void initField(Invoker<?> invoker, Invocation invocation) {
+        serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
+        spanName = serviceInfoProvidable.spanName(invoker, invocation);
+        setInterceptors(serviceName);
+    }
 
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
         //ignore this trace when sample is 0 or null
         if (noneTraceBehaviors.ignoreTrace(invoker, invocation))
             return invoker.invoke(invocation);
+
+        //template method
+        initField(invoker,invocation);
 
         //template method
         if (preHandle(invoker, invocation)) {
@@ -65,8 +75,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         }
     }
 
-    protected void setParentServiceName(String interfaceName, DubboServerRequestAdapter dubboServerRequestAdapter) {
-        SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
+    protected void setParentServiceName(String interfaceName, SpanId spanId) {
         callTreeCache.get().put(spanId.spanId, new LocalSpanId(spanId, interfaceName, interfaceName, Thread.currentThread()));
 //        if (callTreeCache.get().size() == 0) {
 //            long andIncrement = threadName.getAndIncrement();

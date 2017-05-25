@@ -4,6 +4,8 @@ import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
+import com.alibaba.dubbo.rpc.Result;
+import com.alibaba.dubbo.rpc.RpcException;
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.function.AbstractDubboFilter;
@@ -19,6 +21,11 @@ import java.lang.reflect.Field;
 public class BraveConsumerFilter extends AbstractDubboFilter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
     SpanId spanId = null;
+
+    @Override
+    public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        return super.invoke(invoker, invocation);
+    }
 
     /**
      * 反射获取tracer并new spanId
@@ -44,11 +51,9 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
 
     @Override
     public boolean preHandle(Invoker<?> invoker, Invocation invocation) {
-        serviceName = serviceInfoProvidable.serviceName();
-        setInterceptors(serviceName);
         logger.debug(serviceName + " consumer execute");
 
-        DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), serviceName);
+        DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), spanName);
         spanId = newNullableSpanId(clientRequestAdapter);
         if (spanId == null)
             return true;

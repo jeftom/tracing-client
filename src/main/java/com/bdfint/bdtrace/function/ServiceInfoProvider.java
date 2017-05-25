@@ -1,5 +1,7 @@
 package com.bdfint.bdtrace.function;
 
+import com.alibaba.dubbo.rpc.Invocation;
+import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
 import org.slf4j.Logger;
@@ -26,10 +28,19 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
     }
 
     @Override
-    public String serviceName() {
-        RpcContext context = RpcContext.getContext();
-        String serviceInterface = context.getUrl().getServiceInterface();
-        return serviceInterface;
+    public String serviceName(Invoker<?> invoker, Invocation invocation) {
+//
+//
+//        RpcContext context = RpcContext.getContext();
+//        String serviceInterface = context.getUrl().getServiceKey();
+//
+//        int i;
+//        if ((i = serviceInterface.lastIndexOf(".")) > 0) {
+//            String simpleName = serviceInterface.substring(i, serviceInterface.length());
+//            return applicationName() + "-" + simpleName;
+//        }
+//        return serviceInterface;
+        return invoker.getInterface().getSimpleName();
     }
 
     @Override
@@ -47,9 +58,9 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
     }
 
     @Override
-    public String spanName() {
+    public String spanName(Invoker<?> invoker, Invocation invocation) {
         RpcContext context = RpcContext.getContext();
         String methodName = context.getMethodName();
-        return serviceName() + "." + methodName;
+        return serviceName(invoker, invocation) + "." + methodName;
     }
 }

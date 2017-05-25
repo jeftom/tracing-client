@@ -18,7 +18,8 @@ public class NoneTraceBehaviorsImpl implements NoneTraceBehaviors {
         }
 //        status = StatusEnum.OK;
         if ("0".equals(invocation.getAttachment(DubboTraceConst.SAMPLED))
-                || "false".equals(invocation.getAttachment(DubboTraceConst.SAMPLED))) {
+                || "false".equalsIgnoreCase(invocation.getAttachment(DubboTraceConst.SAMPLED))
+                || "null".equalsIgnoreCase(invocation.getAttachment(DubboTraceConst.SAMPLED))) {
             return true;
         }
         return false;

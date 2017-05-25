@@ -13,6 +13,9 @@ public interface FilterTemplate {
 
 //    void ignoreFilt();
 
+    void initField(Invoker<?> invoker, Invocation invocation);
+
+
     /**
      * MUST check return type
      *
