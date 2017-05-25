@@ -80,7 +80,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             errMsg = Arrays.toString(e.getStackTrace());
             throw new RuntimeException(e.getCause());
         } finally {
-            afterHandle();//template method
+            afterHandle(invocation);//template method
             Test.testServiceName(serviceName);
             return result;
         }
@@ -136,7 +136,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     public String handleException(Result result, String serviceName) {
         String msg = null;
         if (result.hasException()) {
-            logger.warn("======================Exception=====================");
+            logger.warn("======================TRACING CLIENT Exception=====================");
 //                result.getException().printStackTrace();
             msg = Arrays.toString(result.getException().getStackTrace());
             logger.warn("serviceName: {}, class: {}", serviceName, this);

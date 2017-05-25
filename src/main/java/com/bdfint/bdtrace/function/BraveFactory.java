@@ -19,10 +19,15 @@ import java.util.Map;
  */
 public class BraveFactory {
     private static final Logger logger = LoggerFactory.getLogger(BraveFactory.class);
+    //const
+    private final static Sender SENDER = OkHttpSender.create(Configuration.getZipkinUrl());
+    private final static AsyncReporter<zipkin.Span> REPORTER = AsyncReporter.builder(SENDER).build();
+    private final static Sampler SAMPLER = Sampler.create(Configuration.getSampler());
+    //static
     private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
     private static Sampler sSampler = new BraveFactory().sampler;
     private static Map<String, Brave> cache = new HashMap<String, Brave>();
-
+    //field
     private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
     private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
     private final Sampler sampler = Sampler.create(Configuration.getSampler());
@@ -34,7 +39,7 @@ public class BraveFactory {
             if (cache.containsKey(serviceName)) {
                 brave = cache.get(serviceName);
             }
-            brave = new Brave.Builder(serviceName).reporter(sReporter).traceSampler(sSampler).build();
+            brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(SAMPLER).build();
             if (brave != null)
                 cache.put(serviceName, brave);
         } catch (Exception e) {

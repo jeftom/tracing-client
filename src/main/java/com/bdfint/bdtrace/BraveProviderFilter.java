@@ -38,7 +38,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
     }
 
     @Override
-    public void afterHandle() {
+    public void afterHandle(Invocation invocation) {
         serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, errMsg, System.currentTimeMillis()));
     }
 }

@@ -62,11 +62,12 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
 
         annotated.clientSent(serviceName, clientRequestAdapter);
 
+
         return false;
     }
 
     @Override
-    public void afterHandle() {
+    public void afterHandle(Invocation invocation) {
         final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(status, errMsg, System.currentTimeMillis());
         clientResponseInterceptor.handle(clientResponseAdapter);
     }
