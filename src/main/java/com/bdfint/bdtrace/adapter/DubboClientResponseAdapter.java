@@ -27,7 +27,7 @@ public class DubboClientResponseAdapter implements ClientResponseAdapter {
 
     public Collection<KeyValueAnnotation> responseAnnotations() {
         Collection<KeyValueAnnotation> annotations = new ArrayList<KeyValueAnnotation>();
-        String elapse = String.valueOf((System.currentTimeMillis() - cs) / 1000) + "ms";
+        String elapse = String.valueOf((System.currentTimeMillis() - cs) / 1000.0) + "ms";
         annotations.add(KeyValueAnnotation.create(DubboTraceConst.WHOLE_ELAPSE, elapse));
         annotations.add(KeyValueAnnotation.create(DubboTraceConst.CLIENT_RESPONSE_STATUS_CODE, status.getDesc()));
         if (msg != null)

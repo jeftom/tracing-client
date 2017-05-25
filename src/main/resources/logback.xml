@@ -2,7 +2,7 @@
 <configuration>
     <property name="logPath" value="./logs"/>
     <property name="logLevel" value="INFO"/>
-    <property name="outPattern" value="[%-5p] %d{yyyy-MM-dd HH:mm:ss.SSS} [tracing-client][%t] [%logger{16}] - %m%n" />
+    <property name="outPattern" value="[%-4p] %d{yy-MM-dd HH:mm:ss.SSS} [%t{8}] [%logger{16}] - %m%n" />
     <property name="maxHistory" value="7" />
     <property name="charSet" value="UTF-8" />
 

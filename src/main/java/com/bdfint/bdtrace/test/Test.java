@@ -1,8 +1,5 @@
 package com.bdfint.bdtrace.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +9,31 @@ import java.util.Set;
  * @desriptioin
  */
 public class Test {
-    private static final Logger logger = LoggerFactory.getLogger(Test.class);
+//    private static final Logger logger = LoggerFactory.getLogger(Test.class);
+    private static Set<Entry> relationship = new HashSet<Entry>();
+
+    static {
+        relationship.add(new Entry("Buy.buy", "BuyA.buyA"));
+        relationship.add(new Entry("Buy.buy", "BuyB.buyB"));
+        relationship.add(new Entry("BuyA.buyA", "BuyAA.buyAA"));
+        relationship.add(new Entry("BuyA.buyA", "BuyAB.buyAB"));
+        relationship.add(new Entry("BuyAB.buyAB", "BuyABA.buyAB"));
+        relationship.add(new Entry("BuyAB.buyAB", "BuyABB.buyAB"));
+    }
+
+    public static void testForParentChildrenRelationship(String parent, String child) {
+        if (!relationship.contains(new Entry(parent, child))) {
+//            logger.info("=================ERROR===================");
+//            logger.info(String.format("parent is <<%s>>,child is <<%s>>", parent, child));
+//            logger.info("=================ERROR===================");
+        }
+    }
+
+    public static void main(String[] args) {
+//        testForParentChildrenRelationship("BuyAB.buyAB", "BuyABB.buyAB");
+//        testForParentChildrenRelationship("BuyABB.buyAB", "BuyABB.buyAB");
+        System.out.println(100000 / 1000.0);
+    }
 
     static class Entry {
         final String parent;
@@ -41,30 +62,6 @@ public class Test {
             return result;
         }
 
-    }
-
-    private static Set<Entry> relationship = new HashSet<Entry>();
-
-    static {
-        relationship.add(new Entry("Buy.buy", "BuyA.buyA"));
-        relationship.add(new Entry("Buy.buy", "BuyB.buyB"));
-        relationship.add(new Entry("BuyA.buyA", "BuyAA.buyAA"));
-        relationship.add(new Entry("BuyA.buyA", "BuyAB.buyAB"));
-        relationship.add(new Entry("BuyAB.buyAB", "BuyABA.buyAB"));
-        relationship.add(new Entry("BuyAB.buyAB", "BuyABB.buyAB"));
-    }
-
-    public static void testForParentChildrenRelationship(String parent, String child) {
-        if (!relationship.contains(new Entry(parent, child))) {
-            logger.info("=================ERROR===================");
-            logger.info(String.format("parent is <<%s>>,child is <<%s>>", parent, child));
-            logger.info("=================ERROR===================");
-        }
-    }
-
-    public static void main(String[] args) {
-        testForParentChildrenRelationship("BuyAB.buyAB", "BuyABB.buyAB");
-        testForParentChildrenRelationship("BuyABB.buyAB", "BuyABB.buyAB");
     }
 
 }

@@ -54,7 +54,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             return invoker.invoke(invocation);
 
         //template method
-        initField(invoker,invocation);
+        initField(invoker, invocation);
 
         //template method
         if (preHandle(invoker, invocation)) {
@@ -90,7 +90,8 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     protected void getParentServiceNameAndSetBrave(String interfaceName, SpanId spanId) {
         if (callTreeCache.get().size() == 0) {
-            logger.info("WARNING when get parent service name");
+            if (spanId.nullableParentId() != null) // 当不是根节点时，consumer端应该获取到父节点的缓存
+                logger.warn("WARNING when get parent service name");
         } else {
             LocalSpanId localSpanId = callTreeCache.get().get(spanId.parentId);//获取父节点缓存，为了使当前节点接收父节点的依赖
 //            logger.info(Thread.currentThread() + "<=>" + localSpanId.getCurrentThread());
@@ -127,7 +128,8 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             logger.warn("======================Exception=====================");
 //                result.getException().printStackTrace();
             msg = Arrays.toString(result.getException().getStackTrace());
-            logger.debug("serviceName: {}, class: {}", interfaceName, this);
+            logger.warn("serviceName: {}, class: {}", interfaceName, this);
+            logger.warn("");
             status = StatusEnum.ERROR;
         }
         return msg;

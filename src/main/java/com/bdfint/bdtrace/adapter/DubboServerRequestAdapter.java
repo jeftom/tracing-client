@@ -57,7 +57,7 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
 
     public Collection<KeyValueAnnotation> requestAnnotations() {
 
-        String elapse = String.valueOf((System.currentTimeMillis() - cs) / 1000) + "ms";
+        String elapse = String.valueOf((System.currentTimeMillis() - cs) / 1000.0) + "ms";
         return Collections.singleton(KeyValueAnnotation.create(DubboTraceConst.CLIENT_TO_SERVER_ELAPSE, elapse));
     }
 

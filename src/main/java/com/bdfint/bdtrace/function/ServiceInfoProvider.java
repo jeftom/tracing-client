@@ -40,7 +40,7 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
 //            return applicationName() + "-" + simpleName;
 //        }
 //        return serviceInterface;
-        return invoker.getInterface().getSimpleName();
+        return applicationName() + "-" + invoker.getInterface().getSimpleName();
     }
 
     @Override
