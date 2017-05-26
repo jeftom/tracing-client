@@ -31,5 +31,5 @@ wget -O zipkin.jar 'https://search.maven.org/remote_content?g=io.zipkin.java&a=z
 ```
 java -jar zipkin.jar
 ```
-最后，browse to http://your_host:9411 to find traces!
+最后，browse to http://zipkin.bdfint.com:9411 to find traces!
 

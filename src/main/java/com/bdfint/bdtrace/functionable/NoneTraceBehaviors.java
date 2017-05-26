@@ -10,5 +10,11 @@ import com.alibaba.dubbo.rpc.Invoker;
  */
 public interface NoneTraceBehaviors {
 
+    /**
+     * 决定当前调用是否被忽略
+     * @param invoker
+     * @param invocation
+     * @return
+     */
     boolean ignoreTrace(Invoker<?> invoker, Invocation invocation);
 }

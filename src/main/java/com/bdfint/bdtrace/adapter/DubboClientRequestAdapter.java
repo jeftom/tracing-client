@@ -1,14 +1,13 @@
 package com.bdfint.bdtrace.adapter;
 
 import com.alibaba.dubbo.rpc.RpcContext;
-import com.bdfint.bdtrace.bean.DubboTraceConst;
+import com.bdfint.bdtrace.function.AttachmentTransmission;
+import com.bdfint.bdtrace.functionable.IAttachmentTransmittable;
 import com.bdfint.bdtrace.util.IPConversionUtils;
 import com.github.kristofa.brave.ClientRequestAdapter;
-import com.github.kristofa.brave.IdConversion;
 import com.github.kristofa.brave.KeyValueAnnotation;
 import com.github.kristofa.brave.SpanId;
 import com.twitter.zipkin.gen.Endpoint;
-import zipkin.Constants;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
@@ -21,17 +20,9 @@ import java.util.Map;
  * @desriptioin
  */
 public class DubboClientRequestAdapter implements ClientRequestAdapter {
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
+    IAttachmentTransmittable transmittable = new AttachmentTransmission();
     private Map<String, String> headers;
     private String spanName;
-
-    public SpanId getSpanId() {
-        return spanId;
-    }
-
     private SpanId spanId;
 
     public DubboClientRequestAdapter(Map<String, String> headers, String spanName) {
@@ -39,25 +30,20 @@ public class DubboClientRequestAdapter implements ClientRequestAdapter {
         this.spanName = spanName;
     }
 
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public SpanId getSpanId() {
+        return spanId;
+    }
+
     public String getSpanName() {
         return this.spanName;
     }
 
     public void addSpanIdToRequest(SpanId spanId) {
-        this.spanId = spanId;
-        if (spanId == null) {
-            headers.put(DubboTraceConst.SAMPLED, "0");
-        } else {
-            headers.put(DubboTraceConst.SAMPLED, "1");
-            headers.put(DubboTraceConst.TRACE_ID, IdConversion.convertToString(spanId.traceId));
-            headers.put(DubboTraceConst.SPAN_ID, IdConversion.convertToString(spanId.spanId));
-            if (spanId.nullableParentId() != null) {
-                headers.put(DubboTraceConst.PARENT_SPAN_ID, IdConversion.convertToString(spanId.parentId));
-            }
-            headers.put(DubboTraceConst.SPAN_NAME, spanName);
-            //TODO
-            headers.put(Constants.CLIENT_SEND, String.valueOf(System.currentTimeMillis()));
-        }
+        transmittable.putAttachments(headers, spanId, spanName);
     }
 
     public Collection<KeyValueAnnotation> requestAnnotations() {

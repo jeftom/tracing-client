@@ -28,7 +28,7 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
     }
 
     /**
-     * 反射获取tracer并new spanId
+     * 反射获取tracer并new spanId,null if sample is 0 or null
      *
      * @param clientRequestAdapter
      * @return
@@ -61,7 +61,6 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
         clientRequestInterceptor.handle(clientRequestAdapter);
 
         annotated.clientSent(serviceName, clientRequestAdapter);
-
 
         return false;
     }

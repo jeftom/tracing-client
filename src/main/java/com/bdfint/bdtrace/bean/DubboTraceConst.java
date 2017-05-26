@@ -29,4 +29,8 @@ public interface DubboTraceConst {
     String SERVER_TO_CLIENT_ELAPSE = "s-c网络耗时";
 
     String WHOLE_ELAPSE = "总耗时";
+
+    String UN_SAMPLE_STATUS = "0";
+
+    String SAMPLE_STATUS = "1";
 }

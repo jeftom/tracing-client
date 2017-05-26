@@ -71,6 +71,8 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             return invoker.invoke(invocation);
         }
         Test.testServiceName(serviceName);
+
+        //invoke
         Result result = null;
         try {
             result = invoker.invoke(invocation);
@@ -86,8 +88,8 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         }
     }
 
-    protected void setParentServiceName(String interfaceName, SpanId spanId) {
-        callTreeCache.get().put(spanId.spanId, new LocalSpanId(spanId, interfaceName, interfaceName, Thread.currentThread()));
+    protected void setParentServiceName(String serviceName, SpanId spanId) {
+        callTreeCache.get().put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()));
 //        if (callTreeCache.get().size() == 0) {
 //            long andIncrement = threadName.getAndIncrement();
 //            logger.info(andIncrement);
