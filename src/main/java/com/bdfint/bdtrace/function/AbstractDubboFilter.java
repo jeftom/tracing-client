@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -20,17 +18,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @desriptioin
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
-    /**
-     * cache for parent service
-     */
-    protected static final ThreadLocal<Map<Long, LocalSpanId>> callTreeCache = new ThreadLocal<Map<Long, LocalSpanId>>() {
-        @Override
-        protected Map<Long, LocalSpanId> initialValue() {
-            return new HashMap<>();
-        }
-    };
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
     private static AtomicLong threadName = new AtomicLong(0);
+    protected ParentServiceNameCacheProcessing cacheProcesser = new ParentServiceNameCacheProcesser();
     // brave and interceptors
     protected Brave brave = null;
     protected ClientRequestInterceptor clientRequestInterceptor;
@@ -89,7 +79,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     }
 
     protected void setParentServiceName(String serviceName, SpanId spanId) {
-        callTreeCache.get().put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()));
+        cacheProcesser.setParentServiceName(serviceName, spanId);
 //        if (callTreeCache.get().size() == 0) {
 //            long andIncrement = threadName.getAndIncrement();
 //            logger.info(andIncrement);
@@ -102,18 +92,13 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     }
 
     protected void getParentServiceNameAndSetBrave(String interfaceName, SpanId spanId) {
-        if (callTreeCache.get().size() == 0) {
-            if (spanId.nullableParentId() != null) // 当不是根节点时，consumer端应该获取到父节点的缓存
-                logger.warn("WARNING when get parent service name");
-        } else {
-            LocalSpanId localSpanId = callTreeCache.get().get(spanId.parentId);//获取父节点缓存，为了使当前节点接收父节点的依赖
-//            logger.info(Thread.currentThread() + "<=>" + localSpanId.getCurrentThread());
-
+        LocalSpanId localSpanId = cacheProcesser.getParentLocalSpanId(interfaceName, spanId);
+        if (localSpanId != null) {
             String parentSpanServiceName = localSpanId.getParentSpanServiceName();
 //            Test.testForParentChildrenRelationship(parentSpanServiceName, interfaceName);
             setInterceptors(parentSpanServiceName);
-
         }
+
     }
 
     protected void setInterceptors(String serviceName) {
