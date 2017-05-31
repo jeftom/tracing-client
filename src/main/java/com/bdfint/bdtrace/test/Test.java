@@ -1,5 +1,7 @@
 package com.bdfint.bdtrace.test;
 
+import org.slf4j.Logger;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,11 +23,11 @@ public class Test {
         relationship.add(new Entry("BuyAB.buyAB", "BuyABB.buyAB"));
     }
 
-    public static void testForParentChildrenRelationship(String parent, String child) {
+    public static void testForParentChildrenRelationship(String parent, String child, Logger logger) {
         if (!relationship.contains(new Entry(parent, child))) {
-//            logger.info("=================ERROR===================");
-//            logger.info(String.format("parent is <<%s>>,child is <<%s>>", parent, child));
-//            logger.info("=================ERROR===================");
+            logger.info("=================ERROR===================");
+            logger.info(String.format("parent is <<%s>>,child is <<%s>>", parent, child));
+            logger.info("=================ERROR===================");
         }
     }
 

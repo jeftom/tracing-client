@@ -2,13 +2,11 @@ package com.bdfint.bdtrace;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.function.AbstractDubboFilter;
+import com.bdfint.bdtrace.util.ClientRequestInterceptorProxy;
 import com.github.kristofa.brave.ClientRequestInterceptor;
 import com.github.kristofa.brave.ClientTracer;
 import com.github.kristofa.brave.SpanId;
@@ -20,10 +18,11 @@ import java.lang.reflect.Field;
 @Activate(group = {Constants.CONSUMER})
 public class BraveConsumerFilter extends AbstractDubboFilter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
-    SpanId spanId = null;
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        if (!RpcContext.getContext().isConsumerSide())
+            logger.error("ERROR ! NOT consumer but enter consumer filter");
         return super.invoke(invoker, invocation);
     }
 
@@ -54,12 +53,16 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
         logger.debug(serviceName + " consumer execute");
 
         DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), spanName);
-        spanId = newNullableSpanId(clientRequestAdapter);
+        // 获取到
+        SpanId spanId = newNullableSpanId(clientRequestAdapter);
         if (spanId == null)
             return true;
-        getParentServiceNameAndSetBrave(serviceName, spanId);
-        clientRequestInterceptor.handle(clientRequestAdapter);
+        if (spanId.nullableParentId() != null)
+            getParentServiceNameAndSetBrave(serviceName, spanId);
 
+        //clientRequestInterceptor has changed to parent service name brave.clientRequestInterceptor
+        clientRequestInterceptor.handle(clientRequestAdapter);
+        new ClientRequestInterceptorProxy().handle(spanId, clientRequestInterceptor, clientRequestAdapter);
         annotated.clientSent(serviceName, clientRequestAdapter);
 
         return false;
@@ -67,7 +70,7 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
 
     @Override
     public void afterHandle(Invocation invocation) {
-        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(status, errMsg, System.currentTimeMillis());
+        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(status, errMsg, annotated.cs());
         clientResponseInterceptor.handle(clientResponseAdapter);
     }
 }

@@ -2,7 +2,7 @@ package com.bdfint.bdtrace.adapter;
 
 import com.alibaba.dubbo.rpc.RpcContext;
 import com.bdfint.bdtrace.function.AttachmentTransmission;
-import com.bdfint.bdtrace.functionable.IAttachmentTransmittable;
+import com.bdfint.bdtrace.functionable.AttachmentTransmittable;
 import com.bdfint.bdtrace.util.IPConversionUtils;
 import com.github.kristofa.brave.ClientRequestAdapter;
 import com.github.kristofa.brave.KeyValueAnnotation;
@@ -20,7 +20,7 @@ import java.util.Map;
  * @desriptioin
  */
 public class DubboClientRequestAdapter implements ClientRequestAdapter {
-    IAttachmentTransmittable transmittable = new AttachmentTransmission();
+    AttachmentTransmittable transmittable = new AttachmentTransmission();
     private Map<String, String> headers;
     private String spanName;
     private SpanId spanId;

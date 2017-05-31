@@ -2,7 +2,7 @@ package com.bdfint.bdtrace.adapter;
 
 import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.function.AttachmentTransmission;
-import com.bdfint.bdtrace.functionable.IAttachmentTransmittable;
+import com.bdfint.bdtrace.functionable.AttachmentTransmittable;
 import com.github.kristofa.brave.KeyValueAnnotation;
 import com.github.kristofa.brave.ServerRequestAdapter;
 import com.github.kristofa.brave.TraceData;
@@ -18,8 +18,8 @@ import java.util.Map;
  * @desriptioin
  */
 public class DubboServerRequestAdapter implements ServerRequestAdapter {
-    long cs;
-    IAttachmentTransmittable transmittable = new AttachmentTransmission();
+    long[] cs;
+    AttachmentTransmittable transmittable = new AttachmentTransmission();
     private Map<String, String> headers;
     private String spanName;
 
@@ -29,7 +29,7 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
     }
 
     public TraceData getTraceData() {
-        return transmittable.getAttachmentsAndBuildTraceData(headers, new long[]{cs});
+        return transmittable.getAttachmentsAndBuildTraceData(headers, cs);
     }
 
     public String getSpanName() {
@@ -38,7 +38,7 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
 
     public Collection<KeyValueAnnotation> requestAnnotations() {
 
-        String elapse = String.valueOf((System.currentTimeMillis() - cs) / 1000.0) + "ms";
+        String elapse = String.valueOf(System.currentTimeMillis() - cs[0]) + "ms";
         return Collections.singleton(KeyValueAnnotation.create(DubboTraceConst.CLIENT_TO_SERVER_ELAPSE, elapse));
     }
 }

@@ -10,7 +10,7 @@ import java.util.Map;
  * @date 2017/5/18.
  * @desriptioin dubbo 参数传递 c to s
  */
-public interface IAttachmentTransmittable {
+public interface AttachmentTransmittable {
 
     /**
      * get SpanId From invocation

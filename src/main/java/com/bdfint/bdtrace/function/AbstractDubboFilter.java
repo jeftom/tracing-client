@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
     private static AtomicLong threadName = new AtomicLong(0);
-    protected ParentServiceNameCacheProcessing cacheProcesser = new ParentServiceNameCacheProcesser();
     // brave and interceptors
     protected Brave brave = null;
     protected ClientRequestInterceptor clientRequestInterceptor;
@@ -29,10 +28,10 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected ServerResponseInterceptor serverResponseInterceptor;
 
     // interface dependencies and impl.
-    protected Annotated annotated = new AnnotatedImpl();
+    protected AnnotatedImpl annotated = new AnnotatedImpl();
     protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
-    protected IAttachmentTransmittable transmitter;
+    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameCacheProcessor();
 
     //field
     protected StatusEnum status = StatusEnum.OK;
@@ -79,7 +78,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     }
 
     protected void setParentServiceName(String serviceName, SpanId spanId) {
-        cacheProcesser.setParentServiceName(serviceName, spanId);
+        cacheProcessor.setParentServiceName(serviceName, spanId);
 //        if (callTreeCache.get().size() == 0) {
 //            long andIncrement = threadName.getAndIncrement();
 //            logger.info(andIncrement);
@@ -91,11 +90,13 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 //        }
     }
 
-    protected void getParentServiceNameAndSetBrave(String interfaceName, SpanId spanId) {
-        LocalSpanId localSpanId = cacheProcesser.getParentLocalSpanId(interfaceName, spanId);
+    protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
+        LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
+
+        //if there is no cache
         if (localSpanId != null) {
             String parentSpanServiceName = localSpanId.getParentSpanServiceName();
-//            Test.testForParentChildrenRelationship(parentSpanServiceName, interfaceName);
+            Test.testForParentChildrenRelationship(parentSpanServiceName, serviceName, logger);
             setInterceptors(parentSpanServiceName);
         }
 
@@ -123,11 +124,11 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     public String handleException(Result result, String serviceName) {
         String msg = null;
         if (result.hasException()) {
-            logger.warn("======================TRACING CLIENT Exception=====================");
+            logger.error("======================TRACING CLIENT Exception=====================");
 //                result.getException().printStackTrace();
             msg = Arrays.toString(result.getException().getStackTrace());
-            logger.warn("serviceName: {}, class: {}", serviceName, this);
-            logger.warn("Exception info {}", result.getException());
+            logger.error("serviceName: {}, class: {}", serviceName, this);
+            logger.error("Exception info {}", result.getException());
             status = StatusEnum.ERROR;
         }
         return msg;

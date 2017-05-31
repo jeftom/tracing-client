@@ -12,5 +12,10 @@ public interface ParentServiceNameCacheProcessing {
 
     void setParentServiceName(String serviceName, SpanId spanId);
 
-    LocalSpanId getParentLocalSpanId(String interfaceName, SpanId spanId);
+    /**
+     * use spanId.spanId as key to get cache
+     * @param spanId
+     * @return
+     */
+    LocalSpanId getParentLocalSpanId(SpanId spanId);
 }

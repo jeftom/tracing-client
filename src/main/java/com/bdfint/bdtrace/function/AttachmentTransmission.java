@@ -1,7 +1,7 @@
 package com.bdfint.bdtrace.function;
 
 import com.bdfint.bdtrace.bean.DubboTraceConst;
-import com.bdfint.bdtrace.functionable.IAttachmentTransmittable;
+import com.bdfint.bdtrace.functionable.AttachmentTransmittable;
 import com.github.kristofa.brave.IdConversion;
 import com.github.kristofa.brave.SpanId;
 import com.github.kristofa.brave.TraceData;
@@ -16,7 +16,7 @@ import static com.github.kristofa.brave.IdConversion.convertToLong;
  * @date 2017/5/26.
  * @desriptioin
  */
-public class AttachmentTransmission implements IAttachmentTransmittable {
+public class AttachmentTransmission implements AttachmentTransmittable {
     static SpanId getSpanId(String traceId, String spanId, String parentSpanId) {
         return SpanId.builder().traceId(convertToLong(traceId)).spanId(convertToLong(spanId))
                 .parentId(parentSpanId == null ? null : convertToLong(parentSpanId)).build();

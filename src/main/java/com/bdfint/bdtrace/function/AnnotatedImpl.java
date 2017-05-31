@@ -5,6 +5,7 @@ import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
 import com.bdfint.bdtrace.functionable.Annotated;
+import com.bdfint.bdtrace.functionable.AnnotationTimestamp;
 import zipkin.Annotation;
 import zipkin.Constants;
 import zipkin.Endpoint;
@@ -14,7 +15,7 @@ import zipkin.Endpoint;
  * @date 2017/5/22.
  * @desriptioin
  */
-public class AnnotatedImpl implements Annotated {
+public class AnnotatedImpl implements Annotated, AnnotationTimestamp {
     Annotation cs;
     Annotation sr;
     Annotation ss;
@@ -85,5 +86,25 @@ public class AnnotatedImpl implements Annotated {
         wholeElapse();
         s2cElapse();
         return annotation;
+    }
+
+    @Override
+    public long cs() {
+        return cs.timestamp;
+    }
+
+    @Override
+    public long sr() {
+        return sr.timestamp;
+    }
+
+    @Override
+    public long ss() {
+        return ss.timestamp;
+    }
+
+    @Override
+    public long cr() {
+        return cr.timestamp;
     }
 }

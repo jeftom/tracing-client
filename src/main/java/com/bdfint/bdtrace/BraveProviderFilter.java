@@ -28,6 +28,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
 
+        annotated.serverReceived(serviceName, dubboServerRequestAdapter);
         SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
         if (spanId == null)// sample is 0 or null
             return true;
@@ -39,6 +40,6 @@ public class BraveProviderFilter extends AbstractDubboFilter {
 
     @Override
     public void afterHandle(Invocation invocation) {
-        serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, errMsg, System.currentTimeMillis()));
+        serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, errMsg, annotated.sr()));
     }
 }
