@@ -61,6 +61,6 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
     public String spanName(Invoker<?> invoker, Invocation invocation) {
         RpcContext context = RpcContext.getContext();
         String methodName = context.getMethodName();
-        return serviceName(invoker, invocation) + "." + methodName;
+        return methodName;
     }
 }

@@ -18,7 +18,7 @@ import java.util.Map;
  * @desriptioin
  */
 public class DubboServerRequestAdapter implements ServerRequestAdapter {
-    long[] cs;
+    long[] cs = new long[]{0L};
     AttachmentTransmittable transmittable = new AttachmentTransmission();
     private Map<String, String> headers;
     private String spanName;

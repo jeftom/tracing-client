@@ -62,7 +62,7 @@ public class AnnotatedImpl implements Annotated, AnnotationTimestamp {
     public Annotation serverReceived(String interfaceName, DubboServerRequestAdapter serverRequestAdapter) {
         Annotation annotation = Annotation.create(System.currentTimeMillis(), zipkin.Constants.SERVER_RECV, Endpoint.create(interfaceName, 0));
         this.sr = annotation;
-        c2sElapse();
+//        c2sElapse();
         return annotation;
     }
 
