@@ -61,7 +61,7 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
             getParentServiceNameAndSetBrave(serviceName, spanId);
 
         //clientRequestInterceptor has changed to parent service name brave.clientRequestInterceptor
-//        clientRequestInterceptor.handle(clientRequestAdapter);
+        clientRequestInterceptor.handle(clientRequestAdapter);
         new ClientRequestInterceptorProxy().handle(spanId, clientRequestInterceptor, clientRequestAdapter);
         annotated.clientSent(serviceName, clientRequestAdapter);
 
