@@ -6,7 +6,6 @@ import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.function.AbstractDubboFilter;
-import com.bdfint.bdtrace.util.ClientRequestInterceptorProxy;
 import com.github.kristofa.brave.ClientRequestInterceptor;
 import com.github.kristofa.brave.ClientTracer;
 import com.github.kristofa.brave.SpanId;
@@ -62,7 +61,7 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
 
         //clientRequestInterceptor has changed to parent service name brave.clientRequestInterceptor
         clientRequestInterceptor.handle(clientRequestAdapter);
-        new ClientRequestInterceptorProxy().handle(spanId, clientRequestInterceptor, clientRequestAdapter);
+//        new ClientRequestInterceptorProxy().handle(spanId, clientRequestInterceptor, clientRequestAdapter);
         annotated.clientSent(serviceName, clientRequestAdapter);
 
         return false;
