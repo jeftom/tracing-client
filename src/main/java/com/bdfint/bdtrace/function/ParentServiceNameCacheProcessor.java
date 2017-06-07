@@ -29,7 +29,7 @@ public class ParentServiceNameCacheProcessor implements ParentServiceNameCachePr
     };
     private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameCacheProcessor.class);
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
-    private static int sInternal = 30 * 1; // unit is ms
+    private static int sInternal = 30 * 1000; // unit is ms
 
     public ParentServiceNameCacheProcessor() {
         clearTask();
@@ -84,7 +84,7 @@ public class ParentServiceNameCacheProcessor implements ParentServiceNameCachePr
 
 
     /**
-     * 定时清理,一旦new一个当前对象则有一个单线程的线程池被创建，FIXME
+     * 定时清理,一旦new一个当前对象则有一个单线程的线程池被修改，重新执行任务
      */
     public void clearTask() {
         SERVICE.scheduleAtFixedRate(new Runnable() {
