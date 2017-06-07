@@ -93,7 +93,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
         LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
 
-        //if there is no cache
+        //if there is no CACHE
         if (localSpanId != null) {
             String parentSpanServiceName = localSpanId.getParentSpanServiceName();
             Test.testForParentChildrenRelationship(parentSpanServiceName, serviceName, logger);

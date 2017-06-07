@@ -2,7 +2,6 @@ package test.com.bdfint.bdtrace.function;
 
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.function.ParentServiceNameCacheProcessor;
-import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
 import com.github.kristofa.brave.SpanId;
 import org.junit.After;
 import org.junit.Assert;
@@ -20,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ParentServiceNameCacheProcessorTest {
     static AtomicLong uuid = new AtomicLong(0);
-    ParentServiceNameCacheProcessing processor = new ParentServiceNameCacheProcessor();
+    ParentServiceNameCacheProcessor processor = new ParentServiceNameCacheProcessor();
 
     //    @Test
 //    public void testtt() throws Exception {
@@ -81,5 +80,17 @@ public class ParentServiceNameCacheProcessorTest {
             Assert.assertEquals(java.util.Optional.ofNullable(spanId.getParentSpanId().traceId), Long.valueOf(i));
             Assert.assertEquals(spanId.getParentSpanServiceName(), String.valueOf(i));
         }
+    }
+
+    @Test
+    public void testClearCache() {
+        processor.setParentServiceName("", SpanId.builder().spanId(1).traceId(1).build());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        boolean b = processor.clearCache();
+        System.out.println(b);
     }
 } 

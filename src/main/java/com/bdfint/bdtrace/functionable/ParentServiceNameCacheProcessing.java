@@ -13,9 +13,18 @@ public interface ParentServiceNameCacheProcessing {
     void setParentServiceName(String serviceName, SpanId spanId);
 
     /**
-     * use spanId.spanId as key to get cache
+     * use spanId.spanId as key to get CACHE
+     *
      * @param spanId
      * @return
      */
     LocalSpanId getParentLocalSpanId(SpanId spanId);
+
+
+    /**
+     * 清理缓存
+     *
+     * @return 是否有清理过缓存
+     */
+    boolean clearCache();
 }

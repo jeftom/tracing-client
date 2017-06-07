@@ -20,6 +20,7 @@ public class LocalSpanId {
         this.parentSpanName = parentSpanName;
         this.parentSpanServiceName = parentSpanServiceName;
         this.currentThread = currentThread;
+        time = System.currentTimeMillis();
     }
 
     public Thread getCurrentThread() {
