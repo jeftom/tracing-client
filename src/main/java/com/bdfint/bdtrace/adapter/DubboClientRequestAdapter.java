@@ -22,12 +22,12 @@ import java.util.Map;
 public class DubboClientRequestAdapter implements ClientRequestAdapter {
     AttachmentTransmittable transmittable = new AttachmentTransmission();
     private Map<String, String> headers;
-    private String spanName;
+    private String serviceName;
     private SpanId spanId;
 
-    public DubboClientRequestAdapter(Map<String, String> headers, String spanName) {
+    public DubboClientRequestAdapter(Map<String, String> headers, String serviceName) {
         this.headers = headers;
-        this.spanName = spanName;
+        this.serviceName = serviceName;
     }
 
     public Map<String, String> getHeaders() {
@@ -39,11 +39,11 @@ public class DubboClientRequestAdapter implements ClientRequestAdapter {
     }
 
     public String getSpanName() {
-        return this.spanName;
+        return this.serviceName;
     }
 
     public void addSpanIdToRequest(SpanId spanId) {
-        transmittable.putAttachments(headers, spanId, spanName);
+        transmittable.putAttachments(headers, spanId, serviceName);
     }
 
     public Collection<KeyValueAnnotation> requestAnnotations() {
@@ -53,7 +53,7 @@ public class DubboClientRequestAdapter implements ClientRequestAdapter {
     public Endpoint serverAddress() {
         InetSocketAddress inetSocketAddress = RpcContext.getContext().getRemoteAddress();
         String ipAddr = RpcContext.getContext().getUrl().getIp();
-        return Endpoint.create(spanName, IPConversionUtils.convertToInt(ipAddr), inetSocketAddress.getPort());
+        return Endpoint.create(serviceName, IPConversionUtils.convertToInt(ipAddr), inetSocketAddress.getPort());
 
     }
 }
