@@ -13,13 +13,13 @@ import java.util.Properties;
  */
 public class Configuration {
     final static String zipkinUrlHead = "http://";
-    static String zipkinHost = "127.0.0.1";
     final static String zipkinPort = ":9411";
     final static String zipkinUrlTail = "/api/v1/spans/";
-    final static String zipkinUrl = "http://" + zipkinHost + "/api/v1/spans/";
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
     private static final String SAMPLER = "sampler";
     private static final String HOST = "domain";
+    static String zipkinHost = "127.0.0.1";
+    final static String zipkinUrl = "http://" + zipkinHost + "/api/v1/spans/";
 
     /**
      * get url from client
@@ -69,5 +69,10 @@ public class Configuration {
 
 //        return 1F;
         return sampler;
+    }
+
+    public static long timeout() {
+        String t = getProperty("timeout");
+        return Long.valueOf(t);
     }
 }

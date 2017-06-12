@@ -35,4 +35,6 @@ public interface DubboTraceConst {
     String UN_SAMPLE_STATUS = "0";
 
     String SAMPLE_STATUS = "1";
+
+    String TIMEOUT = "超时";
 }
