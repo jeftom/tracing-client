@@ -18,7 +18,9 @@ public interface DubboTraceConst {
 
     String CLIENT_RESPONSE_STATUS_CODE = "consumer响应状态";
 
-    String EXCEPTION_MESSAGE = "异常信息";
+    String EXCEPTION_MESSAGE = "异常类型";
+
+    String EXCEPTION_STACK_MESSAGE = "堆栈信息";
 
     String SPAN_NAME = "dubbo.trace.span_name";
 

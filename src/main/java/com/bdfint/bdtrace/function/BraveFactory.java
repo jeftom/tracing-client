@@ -68,7 +68,7 @@ public class BraveFactory {
         Map<String, String> headers = new HashMap<>();
         clientRequestInterceptor.handle(new DubboClientRequestAdapter(headers, "api"));
         System.out.println("mock method calling...");
-        clientResponseInterceptor.handle(new DubboClientResponseAdapter(StatusEnum.OK,"",System.currentTimeMillis()));
+        clientResponseInterceptor.handle(new DubboClientResponseAdapter(StatusEnum.OK,null,System.currentTimeMillis()));
 
     }
 }

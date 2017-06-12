@@ -38,7 +38,6 @@ public class Test {
     }
 
     public static void main(String[] args) {
-//        testForParentChildrenRelationship("BuyAB.buyAB", "BuyABB.buyAB");
 //        testForParentChildrenRelationship("BuyABB.buyAB", "BuyABB.buyAB");
         System.out.println(100000 / 1000.0);
     }

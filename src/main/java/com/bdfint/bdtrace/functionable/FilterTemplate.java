@@ -27,7 +27,7 @@ public interface FilterTemplate {
 
 //    void invoke();
 
-    String handleException(Result result, String serviceName);
+    Throwable handleAndGetException(Result result, String serviceName);
 
     void afterHandle(Invocation invocation);
 }

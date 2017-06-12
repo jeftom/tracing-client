@@ -40,6 +40,6 @@ public class BraveProviderFilter extends AbstractDubboFilter {
 
     @Override
     public void afterHandle(Invocation invocation) {
-        serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, errMsg, annotated.sr()));
+        serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, exception, annotated.sr()));
     }
 }

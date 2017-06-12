@@ -69,7 +69,7 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
 
     @Override
     public void afterHandle(Invocation invocation) {
-        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(status, errMsg, annotated.cs());
+        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(status, exception, annotated.cs());
         clientResponseInterceptor.handle(clientResponseAdapter);
     }
 }

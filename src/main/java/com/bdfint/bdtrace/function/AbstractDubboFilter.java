@@ -3,13 +3,15 @@ package com.bdfint.bdtrace.function;
 import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
-import com.bdfint.bdtrace.functionable.*;
+import com.bdfint.bdtrace.functionable.FilterTemplate;
+import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
+import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
+import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
 import com.bdfint.bdtrace.test.Test;
 import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -37,7 +39,9 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected StatusEnum status = StatusEnum.OK;
     protected String serviceName;
     protected String spanName;
-    protected String errMsg = null;
+    //    protected String errType = null;
+//    protected String errMsg = null;
+    protected Throwable exception;
 
     @Override
     public void initField(Invoker<?> invoker, Invocation invocation) {
@@ -65,10 +69,10 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         Result result = null;
         try {
             result = invoker.invoke(invocation);
-            errMsg = handleException(result, serviceName); //template method
+            exception = handleAndGetException(result, serviceName); //template method
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
-            errMsg = Arrays.toString(e.getStackTrace());
+            exception = new Throwable("dubbo RPC调用异常", e);
             throw new RuntimeException(e.getCause());
         } finally {
             afterHandle(invocation);//template method
@@ -121,17 +125,15 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
      * @param result
      * @return
      */
-    public String handleException(Result result, String serviceName) {
-        String msg = null;
+    public Throwable handleAndGetException(Result result, String serviceName) {
         if (result.hasException()) {
             logger.error("======================TRACING CLIENT Exception=====================");
 //                result.getException().printStackTrace();
-            msg = Arrays.toString(result.getException().getStackTrace());
             logger.error("serviceName: {}, class: {}", serviceName, this);
             logger.error("Exception info {}", result.getException());
             status = StatusEnum.ERROR;
+            return new Throwable("远程方法系统异常", result.getException());
         }
-        return msg;
+        return null;
     }
-
 }
