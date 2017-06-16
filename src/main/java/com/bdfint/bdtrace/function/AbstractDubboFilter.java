@@ -73,7 +73,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
             exception = new Throwable("dubbo RPC调用异常", e);
-            throw new RuntimeException(e.getCause());
+//            throw new RuntimeException(e.getCause());
         } finally {
             afterHandle(invocation);//template method
             Test.testServiceName(serviceName);

@@ -22,7 +22,14 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         if (!RpcContext.getContext().isConsumerSide())
             logger.error("ERROR ! NOT consumer but enter consumer filter");
-        return super.invoke(invoker, invocation);
+        Result result = null;
+        try {
+            result = super.invoke(invoker, invocation);
+        } catch (RpcException e) {
+            result = invoker.invoke(invocation);
+            logger.error("RPC异常，忽略本次追踪。", e);
+        }
+        return result;
     }
 
     /**

@@ -19,7 +19,14 @@ public class BraveProviderFilter extends AbstractDubboFilter {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        return super.invoke(invoker, invocation);
+        Result result = null;
+        try {
+            result = super.invoke(invoker, invocation);
+        } catch (RpcException e) {
+            result = invoker.invoke(invocation);
+            logger.error("RPC异常，忽略本次追踪。", e);
+        }
+        return result;
     }
 
     @Override
