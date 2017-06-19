@@ -10,7 +10,7 @@ public interface ReaderChain {
     /**
      * 读取下一个Reader的内容
      */
-    <T> void readNext(T result);
+    <T> void readForAll(T result);
 
     /**
      * 添加
