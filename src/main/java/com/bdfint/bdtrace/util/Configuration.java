@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * @author heyb
@@ -38,12 +40,7 @@ public class Configuration {
      * @return
      */
     public static String getProperty(String key) {
-        Properties prop = new Properties();
-        try {
-            prop.load(Configuration.class.getClassLoader().getResourceAsStream("zipkin.properties"));
-        } catch (IOException e) {
-            logger.info("异常信息：", e);
-        }
+        Properties prop = getProperties();
         return prop.getProperty(key);
     }
 
@@ -74,5 +71,29 @@ public class Configuration {
     public static long timeout() {
         String t = getProperty("timeout");
         return Long.valueOf(t);
+    }
+
+    public static Properties getProperties() {
+        return getProperties("zipkin.properties");
+    }
+
+    public static Properties getProperties(String path) {
+        Properties prop = new Properties();
+        try {
+            prop.load(Configuration.class.getClassLoader().getResourceAsStream(path));
+        } catch (IOException e) {
+            logger.info("异常信息：", e);
+        }
+        return prop;
+    }
+
+    /**
+     * 获取配置文件的所有k-v
+     *
+     * @return
+     */
+    public static Set<Map.Entry<Object, Object>> listProperties(String path) {
+        Properties prop = getProperties(path);
+        return prop.entrySet();
     }
 }
