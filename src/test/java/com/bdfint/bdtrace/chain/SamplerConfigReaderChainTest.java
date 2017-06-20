@@ -2,6 +2,7 @@ package com.bdfint.bdtrace.chain;
 
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.util.Configuration;
+import com.bdfint.bdtrace.util.SamplerInitilizer;
 import com.github.kristofa.brave.Sampler;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,10 +38,10 @@ public class SamplerConfigReaderChainTest {
     public void testReadForAll() throws Exception {
 
         Set<Map.Entry<Object, Object>> entries = Configuration.listProperties(SAMPLER_PATH);
-        Sampler sampler;
         int[] counts = new int[entries.size()];
         int[] actual = new int[counts.length];
         int idx = 0;
+        Map<String, Sampler> config = SamplerInitilizer.init();
 
         for (Map.Entry<Object, Object> entry : entries) {
             String key = entry.getKey().toString();
@@ -55,16 +56,26 @@ public class SamplerConfigReaderChainTest {
                 serviceSamplerConfigReader.setInterface(key);
                 ReaderChain chain = new SamplerConfigReaderChain();
                 chain.addReader(serviceSamplerConfigReader);
-                chain.addReader(serviceSamplerConfigReader);
-                chain.addReader(serviceSamplerConfigReader);
-                chain.addReader(serviceSamplerConfigReader);
+//                chain.addReader(serviceSamplerConfigReader);
+//                chain.addReader(serviceSamplerConfigReader);
+//                chain.addReader(serviceSamplerConfigReader);
                 chain.readForAll(samplerResult);
+
+
+//                if (samplerResult != null) {
+//                    if (
+////                    (!CONFIG.containsKey(getInterface()) && !globalSampler.defaultSampler().isSampled(0L)) ||
+//                            config.containsKey(key) && !config.get(key).isSampled(0)) {//如果不需要采样，就读取下一个配置文件
+//                        samplerResult.setSampled(false);
+//                    } else samplerResult.setSampled(true);
+//                }
+
                 if (samplerResult.isSampled()) {
                     counts[idx]++;
                 }
+//            Assert.assertEquals((int) (Float.parseFloat(ptg) * 100), idx);
             }
             idx++;
-//            Assert.assertEquals((int) (Float.parseFloat(ptg) * 100), idx);
         }
         Assert.assertArrayEquals(counts, actual);
     }
@@ -86,20 +97,7 @@ public class SamplerConfigReaderChainTest {
         chain.addReader(serviceSamplerConfigReader);
         chain.addReader(serviceSamplerConfigReader);
         chain.addReader(serviceSamplerConfigReader);
-        chain.addReader(new ConfigReader() {
-            /**
-             * 读取配置并处理返回,SamplerResult在读取到NOT采样时一直为false并处理链条的下一个,直到被告知采样则设置为true并返回
-             *
-             * @param config 配置
-             * @param result
-             * @param chain  @return
-             */
-            @Override
-            public <T> void read(Map<String, Sampler> config, T result, ReaderChain chain) {
-
-            }
-        });
     }
 
 
-} 
+}

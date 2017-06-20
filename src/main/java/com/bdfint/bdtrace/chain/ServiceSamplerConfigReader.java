@@ -16,16 +16,15 @@ public class ServiceSamplerConfigReader extends AbstractSamplerConfigReader {
     private static final Logger logger = LoggerFactory.getLogger(ServiceSamplerConfigReader.class);
 
     @Override
-    public <T> void read(Map<String, Sampler> config, T result, ReaderChain chain) {
-        SamplerResult samplerResult = result instanceof SamplerResult ? ((SamplerResult) result) : null;
+    public void read(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain) {
 
         if (samplerResult != null) {
             if (
-//                    (!config.containsKey(getInterface()) && !globalSampler.defaultSampler().isSampled(0L)) ||
+//                    (!CONFIG.containsKey(getInterface()) && !globalSampler.defaultSampler().isSampled(0L)) ||
                     config.containsKey(getInterface()) && !config.get(getInterface()).isSampled(0)) {//如果不需要采样，就读取下一个配置文件
                 logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), false);
                 samplerResult.setSampled(false);
-                chain.readForAll(result);
+                chain.readForAll(samplerResult);
                 return;
             }
 

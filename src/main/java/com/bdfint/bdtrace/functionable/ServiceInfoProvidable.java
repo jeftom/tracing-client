@@ -26,6 +26,14 @@ public interface ServiceInfoProvidable extends SpanNameProvidable {
      */
     String serviceName(Invoker<?> invoker, Invocation invocation);
 
+
+    /**
+     * 获取具有唯一性的服务接口名称
+     * @param invoker
+     * @param invocation
+     * @return
+     */
+    String uniqueInterfaceKey(Invoker<?> invoker, Invocation invocation);
     /**
      * 获取客户端地址，需要上下文环境中调用
      *

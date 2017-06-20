@@ -64,7 +64,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
         //采样处理
         ReaderChain chain = new SamplerConfigReaderChain();
-        serviceSamplerConfigReader.setInterface(serviceInfoProvidable.serviceName(invoker, invocation));
+        serviceSamplerConfigReader.setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
         chain.addReader(serviceSamplerConfigReader);
         chain.readForAll(samplerResult);
         if(!samplerResult.isSampled()){

@@ -1,11 +1,9 @@
 package com.bdfint.bdtrace.chain;
 
-import com.bdfint.bdtrace.util.SamplerInitilizer;
-import com.github.kristofa.brave.Sampler;
+import com.bdfint.bdtrace.bean.SamplerResult;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author heyb
@@ -26,10 +24,10 @@ public class SamplerConfigReaderChain implements ReaderChain {
      * @param result
      */
     @Override
-    public <T> void readForAll(T result) {
+    public void readForAll(SamplerResult result) {
         if (pos < n) {
             ConfigReader_Config readerConfig = readers[pos++];
-            readerConfig.get().read(readerConfig.getSamperConfig(), result, this);
+            readerConfig.get().read(readerConfig.getSamplerConfig(), result, this);
             return;
         }
 
@@ -48,24 +46,7 @@ public class SamplerConfigReaderChain implements ReaderChain {
             readers = new ConfigReader_Config[tmp.length + 1];
             System.arraycopy(tmp, 0, readers, 0, tmp.length);
         }
-        readers[n] = new ConfigReader_Config() {
-            ConfigReader reader;
-
-            @Override
-            public ConfigReader get() {
-                return this.reader;
-            }
-
-            @Override
-            public void setConfigReader(ConfigReader reader) {
-                this.reader = reader;
-            }
-
-            @Override
-            public Map<String, Sampler> getSamperConfig() {
-                return SamplerInitilizer.init();
-            }
-        };
+        readers[n] = new SamplerConfigReader_Config();
         readers[n++].setConfigReader(reader);
         readerList.add(reader);
     }

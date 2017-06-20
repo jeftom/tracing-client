@@ -15,5 +15,5 @@ public interface ConfigReader_Config {
 
     void setConfigReader(ConfigReader reader);
 
-    Map<String, Sampler> getSamperConfig();
+    Map<String, Sampler> getSamplerConfig();
 }

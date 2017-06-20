@@ -1,5 +1,6 @@
 package com.bdfint.bdtrace.function;
 
+import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.RpcContext;
@@ -41,6 +42,29 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
 //        }
 //        return serviceInterface;
         return applicationName() + "-" + invoker.getInterface().getSimpleName();
+    }
+
+    /**
+     * 获取具有唯一性的服务接口名称
+     *
+     * @param invoker
+     * @param invocation
+     * @return
+     */
+    @Override
+    public String uniqueInterfaceKey(Invoker<?> invoker, Invocation invocation) {
+        URL url = RpcContext.getContext().getUrl();
+        String group = url.getParameter("group");
+        String version = url.getParameter("version");
+        String serviceInterface = url.getServiceInterface();
+        String key = group + "/" + serviceInterface + ":" + version;
+
+        logger.debug(key);
+        RpcContext context = RpcContext.getContext();
+        String methodName = context.getMethodName();
+        String name = invoker.getInterface().getName();
+        key = name + "." + methodName;
+        return name;
     }
 
     @Override
