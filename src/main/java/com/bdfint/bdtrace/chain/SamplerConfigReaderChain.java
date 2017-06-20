@@ -50,4 +50,15 @@ public class SamplerConfigReaderChain implements ReaderChain {
         readers[n++].setConfigReader(reader);
         readerList.add(reader);
     }
+
+    /**
+     * 添加readers
+     *
+     * @param readers
+     */
+    @Override
+    public void addReaders(ConfigReader[] readers) {
+        for (ConfigReader reader : readers)
+            addReader(reader);
+    }
 }

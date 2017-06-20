@@ -18,6 +18,15 @@ public interface ReaderChain {
 
     /**
      * 添加
+     *
+     * @param reader
      */
     void addReader(ConfigReader reader);
+
+    /**
+     * 添加readers
+     *
+     * @param readers
+     */
+    void addReaders(ConfigReader[] readers);
 }

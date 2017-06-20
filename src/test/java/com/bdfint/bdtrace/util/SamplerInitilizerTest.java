@@ -1,8 +1,6 @@
 package com.bdfint.bdtrace.util;
 
 import com.github.kristofa.brave.Sampler;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
@@ -16,14 +14,6 @@ import java.util.Map;
  */
 public class SamplerInitilizerTest {
 
-    @Before
-    public void before() throws Exception {
-    }
-
-    @After
-    public void after() throws Exception {
-    }
-
     /**
      * Method: init()
      */
@@ -31,6 +21,14 @@ public class SamplerInitilizerTest {
     public void testInit() throws Exception {
 
         Map<String, Sampler> init = SamplerInitilizer.init();
+        System.out.println(init);
+        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.METHOD_SAMPLER_PATH);
+        System.out.println(init);
+        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.GROUP_SAMPLER_PATH);
+        System.out.println(init);
+        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.APPLICATION_SAMPLER_PATH);
+        System.out.println(init);
+        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.GLOBAL_SAMPLER_PATH);
         System.out.println(init);
 
 

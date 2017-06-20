@@ -28,6 +28,38 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
         return application;
     }
 
+    /**
+     * 分组
+     *
+     * @return
+     */
+    @Override
+    public String group() {
+        return RpcContext.getContext().getUrl().getParameter("group","0");
+    }
+
+    /**
+     * 获取version 值
+     *
+     * @return
+     */
+    @Override
+    public String version() {
+        return RpcContext.getContext().getUrl().getParameter("version", "1.0");
+    }
+
+    /**
+     * 方法名
+     *
+     * @return
+     */
+    @Override
+    public String methodName() {
+        RpcContext context = RpcContext.getContext();
+        String methodName = context.getMethodName();
+        return methodName;
+    }
+
     @Override
     public String serviceName(Invoker<?> invoker, Invocation invocation) {
 //
@@ -83,8 +115,6 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
 
     @Override
     public String spanName(Invoker<?> invoker, Invocation invocation) {
-        RpcContext context = RpcContext.getContext();
-        String methodName = context.getMethodName();
-        return methodName;
+        return methodName();
     }
 }

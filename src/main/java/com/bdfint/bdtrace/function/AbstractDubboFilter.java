@@ -45,9 +45,19 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 //    protected String errMsg = null;
     protected Throwable exception;
     ServiceSamplerConfigReader serviceSamplerConfigReader = new ServiceSamplerConfigReader();
+    AbstractSamplerConfigReader[] readers = {
+            new MethodSamplerConfigReader(),
+            new ServiceSamplerConfigReader(),
+            new GroupSamplerConfigReader(),
+            new ApplicationSamplerConfigReader(),
+            new GlobalSamplerConfigReader()
+    };
     SamplerResult samplerResult = new SamplerResult();
+    AbstractSamplerConfigReader reader = new GlobalSamplerConfigReader();
+    ReaderChain chain = new SamplerConfigReaderChain();
 
     public AbstractDubboFilter() {
+        chain.addReaders(readers);
     }
 
     @Override
@@ -58,14 +68,15 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         Test.testServiceName(serviceName);
     }
 
-    AbstractSamplerConfigReader reader = new GlobalSamplerConfigReader();
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
 
         //采样处理
-        ReaderChain chain = new SamplerConfigReaderChain();
-        serviceSamplerConfigReader.setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
-        chain.addReader(serviceSamplerConfigReader);
-        chain.addReader(reader);
+        readers[0].setInterface(serviceInfoProvidable.methodName());
+        readers[1].setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
+        readers[2].setInterface(serviceInfoProvidable.group());
+        readers[3].setInterface(serviceInfoProvidable.applicationName());
+        readers[4].setInterface("sampler");
+
         chain.readForAll(samplerResult);
         if (!samplerResult.isSampled()) {
             return invoker.invoke(invocation);
