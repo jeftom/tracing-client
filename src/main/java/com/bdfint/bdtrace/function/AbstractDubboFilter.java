@@ -47,6 +47,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 //    protected String errMsg = null;
     protected Throwable exception;
     ServiceSamplerConfigReader serviceSamplerConfigReader = new ServiceSamplerConfigReader();
+    SamplerResult samplerResult = new SamplerResult();
 
     public AbstractDubboFilter() {
     }
@@ -59,7 +60,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         Test.testServiceName(serviceName);
     }
 
-    SamplerResult samplerResult = new SamplerResult();
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
 
         //采样处理
@@ -67,7 +67,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         serviceSamplerConfigReader.setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
         chain.addReader(serviceSamplerConfigReader);
         chain.readForAll(samplerResult);
-        if(!samplerResult.isSampled()){
+        if (!samplerResult.isSampled()) {
             return invoker.invoke(invocation);
         }
 
@@ -82,7 +82,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         if (preHandle(invoker, invocation)) {
             return invoker.invoke(invocation);
         }
-        Test.testServiceName(serviceName);
 
         //invoke
         Result result = null;
