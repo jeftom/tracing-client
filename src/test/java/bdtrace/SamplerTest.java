@@ -15,26 +15,29 @@ public class SamplerTest {
 
     @Test
     public void test() {
-        float percentage = 0.11F;
-        Sampler sampler = Sampler.create(percentage);
-        boolean[] rs = new boolean[100];
-        int count = 0;
-        for (int i = 0; i < 100; i++) {
-            boolean sampled = sampler.isSampled(new Random().nextLong());
-            rs[i] = sampled;
-            if (sampled)
-                count++;
-        }
-        Assert.assertEquals((int) (percentage * 100), count);
+        for (int j = 0; j < 10; j++) {
 
-        count = 0;
-        for (int i = 0; i < 100; i++) {
-            boolean sampled = sampler.isSampled(0);
-            rs[i] = sampled;
-            if (sampled)
-                count++;
+            float percentage = 0.11F;
+            Sampler sampler = Sampler.create(percentage);
+            boolean[] rs = new boolean[100];
+            int count = 0;
+            for (int i = 0; i < 100; i++) {
+                boolean sampled = sampler.isSampled(new Random().nextLong());
+                rs[i] = sampled;
+                if (sampled)
+                    count++;
+            }
+            Assert.assertEquals((int) (percentage * 100), count);
+
+            count = 0;
+            for (int i = 0; i < 100; i++) {
+                boolean sampled = sampler.isSampled(0);
+                rs[i] = sampled;
+                if (sampled)
+                    count++;
+            }
+            Assert.assertEquals((int) (percentage * 100), count);
         }
-        Assert.assertEquals((int) (percentage * 100), count);
+
     }
-
 }

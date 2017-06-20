@@ -1,3 +1,0 @@
-[INFO ] 2017-05-23 15:27:10.125 [tracing-client][main] [c.b.b.s.Configuration] - tracing-client的采样率为：0.1
-[INFO ] 2017-05-23 16:09:19.714 [tracing-client][main] [c.b.b.s.Configuration] - http://zipkin.bdfint.com:9411/api/v1/spans/
-[INFO ] 2017-05-23 16:15:12.057 [tracing-client][main] [c.b.b.s.Configuration] - http://zipkin.bdfint.com:9411/api/v1/spans/

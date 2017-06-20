@@ -38,7 +38,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
     protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameCacheProcessor();
-    protected ReaderChain chain = new SamplerConfigReaderChain();
 
     //field
     protected StatusEnum status = StatusEnum.OK;
@@ -60,11 +59,11 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         Test.testServiceName(serviceName);
     }
 
+    SamplerResult samplerResult = new SamplerResult();
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
 
         //采样处理
-        ServiceSamplerConfigReader serviceSamplerConfigReader = new ServiceSamplerConfigReader();
-        SamplerResult samplerResult = new SamplerResult();
+        ReaderChain chain = new SamplerConfigReaderChain();
         serviceSamplerConfigReader.setInterface(serviceInfoProvidable.serviceName(invoker, invocation));
         chain.addReader(serviceSamplerConfigReader);
         chain.readForAll(samplerResult);

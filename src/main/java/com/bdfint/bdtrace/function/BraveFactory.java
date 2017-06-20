@@ -3,6 +3,7 @@ package com.bdfint.bdtrace.function;
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
+import com.bdfint.bdtrace.functionable.GlobalSampler;
 import com.bdfint.bdtrace.util.Configuration;
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.ClientRequestInterceptor;
@@ -29,11 +30,12 @@ public class BraveFactory {
     //const
     private final static Sender SENDER = OkHttpSender.create(Configuration.getZipkinUrl());
     private final static AsyncReporter<zipkin.Span> REPORTER = AsyncReporter.builder(SENDER).build();
-    private final static Sampler SAMPLER = Sampler.create(Configuration.getSampler());
+    private final static GlobalSampler GLOBAL_SAMPLER = new DefaultGlobalSampler();
+    private final static Sampler SAMPLER = GLOBAL_SAMPLER.defaultSampler();
     //static
 //    private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
 //    private static Sampler sSampler = new BraveFactory().sampler;
-    private static Map<String, Brave> cache = new HashMap<String, Brave>();
+    private final static Map<String, Brave> CACHE = new HashMap<String, Brave>();
     //field
 //    private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
 //    private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
@@ -43,12 +45,12 @@ public class BraveFactory {
 
         Brave brave = null;
         try {
-            if (cache.containsKey(serviceName)) {
-                brave = cache.get(serviceName);
+            if (CACHE.containsKey(serviceName)) {
+                brave = CACHE.get(serviceName);
             }
             brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(SAMPLER).build();
             if (brave != null)
-                cache.put(serviceName, brave);
+                CACHE.put(serviceName, brave);
         } catch (Exception e) {
             logger.info("异常信息：", e);
         } finally {
@@ -68,7 +70,7 @@ public class BraveFactory {
         Map<String, String> headers = new HashMap<>();
         clientRequestInterceptor.handle(new DubboClientRequestAdapter(headers, "api"));
         System.out.println("mock method calling...");
-        clientResponseInterceptor.handle(new DubboClientResponseAdapter(StatusEnum.OK,null,System.currentTimeMillis()));
+        clientResponseInterceptor.handle(new DubboClientResponseAdapter(StatusEnum.OK, null, System.currentTimeMillis()));
 
     }
 }

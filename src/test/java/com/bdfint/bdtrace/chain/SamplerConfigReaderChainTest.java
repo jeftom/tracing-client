@@ -38,12 +38,15 @@ public class SamplerConfigReaderChainTest {
 
         Set<Map.Entry<Object, Object>> entries = Configuration.listProperties(SAMPLER_PATH);
         Sampler sampler;
+        int[] counts = new int[entries.size()];
+        int[] actual = new int[counts.length];
+        int idx = 0;
 
         for (Map.Entry<Object, Object> entry : entries) {
             String key = entry.getKey().toString();
             String ptg = entry.getValue().toString();
+            actual[idx] = (int) (Float.parseFloat(ptg) * 100);
 
-            int count = 0;
             for (int i = 0; i < 100; i++) {
 
                 //采样处理
@@ -52,13 +55,18 @@ public class SamplerConfigReaderChainTest {
                 serviceSamplerConfigReader.setInterface(key);
                 ReaderChain chain = new SamplerConfigReaderChain();
                 chain.addReader(serviceSamplerConfigReader);
+                chain.addReader(serviceSamplerConfigReader);
+                chain.addReader(serviceSamplerConfigReader);
+                chain.addReader(serviceSamplerConfigReader);
                 chain.readForAll(samplerResult);
                 if (samplerResult.isSampled()) {
-                    count++;
+                    counts[idx]++;
                 }
             }
-            Assert.assertEquals((int) (Float.parseFloat(ptg) * 100), count);
+            idx++;
+//            Assert.assertEquals((int) (Float.parseFloat(ptg) * 100), idx);
         }
+        Assert.assertArrayEquals(counts, actual);
     }
 
     /**
@@ -66,7 +74,31 @@ public class SamplerConfigReaderChainTest {
      */
     @Test
     public void testAddReader() throws Exception {
-//TODO: Test goes here... 
+        ServiceSamplerConfigReader serviceSamplerConfigReader = new ServiceSamplerConfigReader();
+        serviceSamplerConfigReader.setInterface("aaa");
+        ReaderChain chain = new SamplerConfigReaderChain();
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(new ConfigReader() {
+            /**
+             * 读取配置并处理返回,SamplerResult在读取到NOT采样时一直为false并处理链条的下一个,直到被告知采样则设置为true并返回
+             *
+             * @param config 配置
+             * @param result
+             * @param chain  @return
+             */
+            @Override
+            public <T> void read(Map<String, Sampler> config, T result, ReaderChain chain) {
+
+            }
+        });
     }
 
 

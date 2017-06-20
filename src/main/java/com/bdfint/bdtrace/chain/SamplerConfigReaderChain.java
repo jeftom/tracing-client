@@ -43,6 +43,11 @@ public class SamplerConfigReaderChain implements ReaderChain {
      */
     @Override
     public void addReader(ConfigReader reader) {
+        if (n >= readers.length) {
+            ConfigReader_Config[] tmp = readers;
+            readers = new ConfigReader_Config[tmp.length + 1];
+            System.arraycopy(tmp, 0, readers, 0, tmp.length);
+        }
         readers[n] = new ConfigReader_Config() {
             ConfigReader reader;
 

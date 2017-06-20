@@ -1,6 +1,8 @@
 package com.bdfint.bdtrace.chain;
 
+import com.bdfint.bdtrace.function.DefaultGlobalSampler;
 import com.bdfint.bdtrace.functionable.CurrentInterface;
+import com.bdfint.bdtrace.functionable.GlobalSampler;
 
 /**
  * @author heyb
@@ -8,6 +10,7 @@ import com.bdfint.bdtrace.functionable.CurrentInterface;
  * @desriptioin
  */
 public abstract class AbstractSamplerConfigReader implements ConfigReader, CurrentInterface {
+    GlobalSampler globalSampler = new DefaultGlobalSampler();
     String name;
 
     @Override
