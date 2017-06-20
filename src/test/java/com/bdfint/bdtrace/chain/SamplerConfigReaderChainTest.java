@@ -2,8 +2,6 @@ package com.bdfint.bdtrace.chain;
 
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.util.Configuration;
-import com.bdfint.bdtrace.util.SamplerInitilizer;
-import com.github.kristofa.brave.Sampler;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,45 +37,36 @@ public class SamplerConfigReaderChainTest {
 
         Set<Map.Entry<Object, Object>> entries = Configuration.listProperties(SAMPLER_PATH);
         int[] counts = new int[entries.size()];
+        int[] global = new int[entries.size()];
+
         int[] actual = new int[counts.length];
         int idx = 0;
-        Map<String, Sampler> config = SamplerInitilizer.init();
 
         for (Map.Entry<Object, Object> entry : entries) {
             String key = entry.getKey().toString();
             String ptg = entry.getValue().toString();
             actual[idx] = (int) (Float.parseFloat(ptg) * 100);
+            global[idx] = (int) (Configuration.getSampler() * 100);
 
             for (int i = 0; i < 100; i++) {
 
                 //采样处理
-                ServiceSamplerConfigReader serviceSamplerConfigReader = new ServiceSamplerConfigReader();
+//                AbstractSamplerConfigReader reader = new ServiceSamplerConfigReader();
+                AbstractSamplerConfigReader reader = new GlobalSamplerConfigReader();
                 SamplerResult samplerResult = new SamplerResult();
-                serviceSamplerConfigReader.setInterface(key);
+                reader.setInterface(key);
                 ReaderChain chain = new SamplerConfigReaderChain();
-                chain.addReader(serviceSamplerConfigReader);
-//                chain.addReader(serviceSamplerConfigReader);
-//                chain.addReader(serviceSamplerConfigReader);
-//                chain.addReader(serviceSamplerConfigReader);
+                chain.addReader(reader);
                 chain.readForAll(samplerResult);
-
-
-//                if (samplerResult != null) {
-//                    if (
-////                    (!CONFIG.containsKey(getInterface()) && !globalSampler.defaultSampler().isSampled(0L)) ||
-//                            config.containsKey(key) && !config.get(key).isSampled(0)) {//如果不需要采样，就读取下一个配置文件
-//                        samplerResult.setSampled(false);
-//                    } else samplerResult.setSampled(true);
-//                }
 
                 if (samplerResult.isSampled()) {
                     counts[idx]++;
                 }
-//            Assert.assertEquals((int) (Float.parseFloat(ptg) * 100), idx);
             }
             idx++;
         }
-        Assert.assertArrayEquals(counts, actual);
+//        Assert.assertArrayEquals(counts, actual);
+        Assert.assertArrayEquals(counts, global);
     }
 
     /**

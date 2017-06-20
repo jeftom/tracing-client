@@ -4,9 +4,7 @@ import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.bean.StatusEnum;
-import com.bdfint.bdtrace.chain.ReaderChain;
-import com.bdfint.bdtrace.chain.SamplerConfigReaderChain;
-import com.bdfint.bdtrace.chain.ServiceSamplerConfigReader;
+import com.bdfint.bdtrace.chain.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
 import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
@@ -60,12 +58,14 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         Test.testServiceName(serviceName);
     }
 
+    AbstractSamplerConfigReader reader = new GlobalSamplerConfigReader();
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
 
         //采样处理
         ReaderChain chain = new SamplerConfigReaderChain();
         serviceSamplerConfigReader.setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
         chain.addReader(serviceSamplerConfigReader);
+        chain.addReader(reader);
         chain.readForAll(samplerResult);
         if (!samplerResult.isSampled()) {
             return invoker.invoke(invocation);

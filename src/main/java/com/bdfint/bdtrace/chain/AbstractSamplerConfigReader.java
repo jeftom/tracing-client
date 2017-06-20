@@ -32,7 +32,7 @@ public abstract class AbstractSamplerConfigReader implements ConfigReader, Curre
     public void read(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain) {
 
         if (samplerResult != null) {
-            if (!conditionOnSampling(config)) {//如果不需要采样，就读取下一个配置文件
+            if (conditionOnNotSampling(config)) {//如果不需要采样，就读取下一个配置文件
                 logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), false);
                 samplerResult.setSampled(false);
                 chain.readForAll(samplerResult);
@@ -44,6 +44,6 @@ public abstract class AbstractSamplerConfigReader implements ConfigReader, Curre
         }
     }
 
-    protected abstract boolean conditionOnSampling(Map<String, Sampler> config);
+    protected abstract boolean conditionOnNotSampling(Map<String, Sampler> config);
 
 }

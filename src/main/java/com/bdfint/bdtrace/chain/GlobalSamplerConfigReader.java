@@ -16,7 +16,7 @@ public class GlobalSamplerConfigReader extends AbstractSamplerConfigReader {
     private static final GlobalSampler GLOBAL_SAMPLER = new DefaultGlobalSampler();
 
     @Override
-    protected boolean conditionOnSampling(Map<String, Sampler> config) {
-        return !config.containsKey(getInterface()) && !GLOBAL_SAMPLER.defaultSampler().isSampled(0L);
+    protected boolean conditionOnNotSampling(Map<String, Sampler> config) {
+        return !GLOBAL_SAMPLER.defaultSampler().isSampled(0L);
     }
 }

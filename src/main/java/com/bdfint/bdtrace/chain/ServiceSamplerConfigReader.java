@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class ServiceSamplerConfigReader extends AbstractSamplerConfigReader {
 
-    protected boolean conditionOnSampling(Map<String, Sampler> config) {
+    protected boolean conditionOnNotSampling(Map<String, Sampler> config) {
         return config.containsKey(getInterface()) && !config.get(getInterface()).isSampled(0);//如果不需要采样，就读取下一个配置文件
     }
 }
