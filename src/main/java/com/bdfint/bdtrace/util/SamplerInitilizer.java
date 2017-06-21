@@ -48,8 +48,6 @@ public class SamplerInitilizer {
             Pattern pattern = Pattern.compile("^(0|1|1.0|(0\\.\\d+))$");
 
             for (SamplerInitilizer.SamplerType type : SamplerInitilizer.SamplerType.values()) {
-                String t = type.toString();
-                System.out.println(t);
                 Map<String, Sampler> samplerConfig = type.config;
                 Object obj = YamlUitl.get(type);
 

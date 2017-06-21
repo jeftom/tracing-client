@@ -41,6 +41,11 @@ public class SamplerConfigReader_Config implements ConfigReader_Config {
 
     @Override
     public Map<String, Sampler> getSamplerConfig() {
-        return CONFIG.get(reader.type());
+        return CONFIG.get(reader.type().toString());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(CONFIG);
+        System.out.println(CONFIG.get(SamplerInitilizer.SamplerType.APPLICATION_SAMPLER_PATH.toString()));
     }
 }
