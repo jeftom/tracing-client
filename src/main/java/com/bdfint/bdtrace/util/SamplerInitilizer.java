@@ -22,6 +22,7 @@ public class SamplerInitilizer {
 //    private final static Map<String, Sampler> SAMPLER_CONFIG = new ConcurrentHashMap<>();
 //    private final static Map<String, Map<String, Sampler>> TYPES_SAMPLER_CONFIG = new ConcurrentHashMap<>();
 
+
     /**
      * 实现必须为线程安全的，在dubbo的多线程中使用
      *
@@ -35,38 +36,49 @@ public class SamplerInitilizer {
         return type.config;
     }
 
+
     enum SamplerType {
-        METHOD_SAMPLER_PATH("sampler.method.properties", new ConcurrentHashMap<>()),
-        SERVICE_SAMPLER_PATH("sampler.service.properties", new ConcurrentHashMap<>()),
-        GROUP_SAMPLER_PATH("sampler.group.properties", new ConcurrentHashMap<>()),
-        APPLICATION_SAMPLER_PATH("sampler.application.properties", new ConcurrentHashMap<>()),
-        GLOBAL_SAMPLER_PATH("sampler.global.properties", new ConcurrentHashMap<>());
+
+        METHOD_SAMPLER_PATH("method", new ConcurrentHashMap<>()),
+        SERVICE_SAMPLER_PATH("service", new ConcurrentHashMap<>()),
+        GROUP_SAMPLER_PATH("group", new ConcurrentHashMap<>()),
+        APPLICATION_SAMPLER_PATH("application", new ConcurrentHashMap<>()),
+        GLOBAL_SAMPLER_PATH("global", new ConcurrentHashMap<>());
 
         static {
-
             Pattern pattern = Pattern.compile("^(0|1|1.0|(0\\.\\d+))$");
-            for (SamplerType type : SamplerType.values()) {
 
+            for (SamplerInitilizer.SamplerType type : SamplerInitilizer.SamplerType.values()) {
+                String t = type.toString();
+                System.out.println(t);
                 Map<String, Sampler> samplerConfig = type.config;
-                Set<Map.Entry<Object, Object>> entries = Configuration.listProperties(type.path);
+                Object obj = YamlUitl.get(type);
+
                 Sampler sampler;
-
-                for (Map.Entry<Object, Object> entry : entries) {
-                    String key = entry.getKey().toString();
-                    String ptg = entry.getValue().toString();
-//                    Matcher matcher = pattern.matcher(ptg);
-//                    if (matcher.find()) {
-                    try {
-                        sampler = Sampler.create(Float.parseFloat(ptg));
-                        samplerConfig.put(key, sampler);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace();
+                if (obj instanceof Map) {
+                    Set<Map.Entry<String, Object>> entries = ((Map) obj).entrySet();
+                    for (Map.Entry<String, Object> entry : entries) {
+                        String key = entry.getKey();
+                        String ptg = String.valueOf(entry.getValue());
+                        try {
+                            sampler = Sampler.create(Float.parseFloat(ptg));
+                            samplerConfig.put(key, sampler);
+                        } catch (NumberFormatException e) {
+                            e.printStackTrace();
+                        } catch (IllegalArgumentException e) {
+                            e.printStackTrace();
+                        }
                     }
-//                    }
-                }
+                } else if (obj instanceof Integer) {
+                    Integer iVal = (Integer) obj;
+                    sampler = Sampler.create(Float.parseFloat(String.valueOf(iVal)));
+                    samplerConfig.put("", sampler);
 
+                } else if (obj instanceof Double) {
+                    Double dVal = (Double) obj;
+                    sampler = Sampler.create(Float.parseFloat(String.valueOf(dVal)));
+                    samplerConfig.put("", sampler);
+                }
             }
         }
 
@@ -76,6 +88,15 @@ public class SamplerInitilizer {
         SamplerType(String s, Map<String, Sampler> map) {
             path = s;
             config = map;
+        }
+
+        @Override
+        public String toString() {
+            return path;
+        }
+
+        public Map<String, Sampler> getConfig() {
+            return config;
         }
     }
 }

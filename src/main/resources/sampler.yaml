@@ -1,0 +1,18 @@
+# 以下五类采样率可分别设置，查找顺序为method->servcie->group->application->global , 范围是 0.01 - 1.0
+method:
+  com.bdfint.trade.buy.buyAll : 1.0
+  com.bdfint.trade.sell.sellSingle : 0.05
+
+service:
+  com.bdfint.trade.buy : 0.05
+  com.bdfint.trade.sell : 0.05
+
+group:
+  x: 0.05
+  y: 0.05
+
+application:
+  trade: 0.05
+#  logistic: 0.05
+
+global: 0.05 #允许单个值
