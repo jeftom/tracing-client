@@ -1,6 +1,7 @@
 package com.bdfint.bdtrace.chain;
 
 import com.bdfint.bdtrace.bean.SamplerResult;
+import com.bdfint.bdtrace.util.SamplerInitilizer;
 import com.github.kristofa.brave.Sampler;
 
 import java.util.Map;
@@ -20,4 +21,11 @@ public interface ConfigReader {
      * @param chain  @return
      */
     void read(Map<String, Sampler> config, SamplerResult result, ReaderChain chain);
+
+    /**
+     * 决定当前的分类类型
+     *
+     * @return
+     */
+    SamplerInitilizer.SamplerType type();
 }

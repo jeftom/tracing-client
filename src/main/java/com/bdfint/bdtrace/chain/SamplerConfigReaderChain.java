@@ -2,9 +2,6 @@ package com.bdfint.bdtrace.chain;
 
 import com.bdfint.bdtrace.bean.SamplerResult;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author heyb
  * @date 2017/6/19.
@@ -15,8 +12,6 @@ public class SamplerConfigReaderChain implements ReaderChain {
     ConfigReader_Config[] readers = new ConfigReader_Config[1];
     int pos = 0;
     int n = 0;
-
-    List<ConfigReader> readerList = new ArrayList<>();
 
     /**
      * 读取下一个Reader的内容
@@ -48,7 +43,6 @@ public class SamplerConfigReaderChain implements ReaderChain {
         }
         readers[n] = new SamplerConfigReader_Config();
         readers[n++].setConfigReader(reader);
-        readerList.add(reader);
     }
 
     /**

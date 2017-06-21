@@ -2,6 +2,7 @@ package com.bdfint.bdtrace.chain;
 
 import com.bdfint.bdtrace.function.DefaultGlobalSampler;
 import com.bdfint.bdtrace.functionable.GlobalSampler;
+import com.bdfint.bdtrace.util.SamplerInitilizer;
 import com.github.kristofa.brave.Sampler;
 
 import java.util.Map;
@@ -17,6 +18,16 @@ public class GlobalSamplerConfigReader extends AbstractSamplerConfigReader {
 
     @Override
     protected boolean conditionOnNotSampling(Map<String, Sampler> config) {
-        return !GLOBAL_SAMPLER.defaultSampler().isSampled(0L);
+        return !config.values().iterator().next().isSampled(0);
+    }
+
+    /**
+     * 决定当前的分类类型
+     *
+     * @return
+     */
+    @Override
+    public SamplerInitilizer.SamplerType type() {
+        return SamplerInitilizer.SamplerType.GLOBAL_SAMPLER_PATH;
     }
 }

@@ -22,7 +22,6 @@ public class SamplerInitilizer {
 //    private final static Map<String, Sampler> SAMPLER_CONFIG = new ConcurrentHashMap<>();
 //    private final static Map<String, Map<String, Sampler>> TYPES_SAMPLER_CONFIG = new ConcurrentHashMap<>();
 
-
     /**
      * 实现必须为线程安全的，在dubbo的多线程中使用
      *
@@ -37,7 +36,7 @@ public class SamplerInitilizer {
     }
 
 
-    enum SamplerType {
+    public enum SamplerType {
 
         METHOD_SAMPLER_PATH("method", new ConcurrentHashMap<>()),
         SERVICE_SAMPLER_PATH("service", new ConcurrentHashMap<>()),
