@@ -161,7 +161,9 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             logger.error("serviceName: {}, class: {}", serviceName, this);
             logger.error("Exception info {}", result.getException());
             status = StatusEnum.ERROR;
-            return new Throwable("远程方法系统异常", result.getException());
+//            return new Throwable("远程方法系统异常", result.getException());
+            logger.error("远程方法系统异常");
+            return result.getException();
         }
         return null;
     }
