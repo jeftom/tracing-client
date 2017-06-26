@@ -29,4 +29,9 @@ public interface ReaderChain {
      * @param readers
      */
     void addReaders(ConfigReader[] readers);
+
+    /**
+     * 重置pos指针
+     */
+    void reset();
 }

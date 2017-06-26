@@ -1,6 +1,7 @@
 package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
+import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.bean.StatusEnum;
@@ -69,14 +70,18 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         Test.testServiceName(serviceName);
     }
 
+    @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
 
+        System.out.println("hashCode ="+this);
+
         //采样处理
+        chain.reset();
         readers[0].setInterface(serviceInfoProvidable.methodName(invoker, invocation));
         readers[1].setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
         readers[2].setInterface(serviceInfoProvidable.group());
         readers[3].setInterface(serviceInfoProvidable.applicationName());
-        readers[4].setInterface("sampler");
+        readers[4].setInterface(DubboTraceConst.GLOBAL_SAMPLER_KEY);
 
         chain.readForAll(samplerResult);
         if (!samplerResult.isSampled()) {

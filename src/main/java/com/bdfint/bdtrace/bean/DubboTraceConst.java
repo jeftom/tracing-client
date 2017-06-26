@@ -37,4 +37,6 @@ public interface DubboTraceConst {
     String SAMPLE_STATUS = "1";
 
     String TIMEOUT = "超时";
+
+    String GLOBAL_SAMPLER_KEY = "";
 }

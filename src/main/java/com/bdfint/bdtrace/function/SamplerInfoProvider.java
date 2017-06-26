@@ -32,8 +32,9 @@ public class SamplerInfoProvider implements ServiceInfoProvidable {
     @Override
     public String group() {
         String group = RpcContext.getContext().getUrl().getParameter("group", "0");
-        return applicationName() + "." + group;
+        return group == null ? null : applicationName() + "." + group;
     }
+
 
     /**
      * 获取version 值
@@ -65,7 +66,7 @@ public class SamplerInfoProvider implements ServiceInfoProvidable {
     @Override
     public String serviceName(Invoker<?> invoker, Invocation invocation) {
         String s = applicationName() + "-" + invoker.getInterface().getSimpleName();
-        return group() + "." + s;
+        return group() == null ? s : "." + s;
     }
 
     /**

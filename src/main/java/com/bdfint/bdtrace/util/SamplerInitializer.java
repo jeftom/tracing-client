@@ -1,5 +1,6 @@
 package com.bdfint.bdtrace.util;
 
+import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.github.kristofa.brave.Sampler;
 
 import java.util.Map;
@@ -69,12 +70,12 @@ public class SamplerInitializer {
                 } else if (obj instanceof Integer) {
                     Integer iVal = (Integer) obj;
                     sampler = Sampler.create(Float.parseFloat(String.valueOf(iVal)));
-                    samplerConfig.put("", sampler);
+                    samplerConfig.put(DubboTraceConst.GLOBAL_SAMPLER_KEY, sampler);
 
                 } else if (obj instanceof Double) {
                     Double dVal = (Double) obj;
                     sampler = Sampler.create(Float.parseFloat(String.valueOf(dVal)));
-                    samplerConfig.put("", sampler);
+                    samplerConfig.put(DubboTraceConst.GLOBAL_SAMPLER_KEY, sampler);
                 }
             }
         }

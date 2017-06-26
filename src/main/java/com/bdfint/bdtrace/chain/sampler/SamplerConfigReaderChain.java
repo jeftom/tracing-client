@@ -58,4 +58,12 @@ public class SamplerConfigReaderChain implements ReaderChain {
         for (ConfigReader reader : readers)
             addReader(reader);
     }
+
+    /**
+     * 重置pos指针
+     */
+    @Override
+    public void reset() {
+        pos = 0;
+    }
 }
