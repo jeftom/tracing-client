@@ -1,6 +1,6 @@
 package com.bdfint.bdtrace.chain.sampler;
 
-import com.bdfint.bdtrace.util.SamplerInitilizer;
+import com.bdfint.bdtrace.util.SamplerInitializer;
 
 /**
  * @author heyb
@@ -15,7 +15,7 @@ public class ApplicationSamplerConfigReader extends AbstractSamplerConfigReader 
      * @return
      */
     @Override
-    public SamplerInitilizer.SamplerType type() {
-        return SamplerInitilizer.SamplerType.APPLICATION_SAMPLER_PATH;
+    public SamplerInitializer.SamplerType type() {
+        return SamplerInitializer.SamplerType.APPLICATION_SAMPLER_PATH;
     }
 }

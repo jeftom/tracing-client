@@ -1,7 +1,7 @@
 package com.bdfint.bdtrace.chain;
 
 import com.bdfint.bdtrace.bean.SamplerResult;
-import com.bdfint.bdtrace.util.SamplerInitilizer;
+import com.bdfint.bdtrace.util.SamplerInitializer;
 import com.github.kristofa.brave.Sampler;
 
 import java.util.Map;
@@ -27,5 +27,5 @@ public interface ConfigReader {
      *
      * @return
      */
-    SamplerInitilizer.SamplerType type();
+    SamplerInitializer.SamplerType type();
 }

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * @date 2017/6/19.
  * @desriptioin
  */
-public class SamplerInitilizer {
+public class SamplerInitializer {
 
 //    private static final String METHOD_SAMPLER_PATH = "sampler.method.properties";
 //    private static final String SERVICE_SAMPLER_PATH = "sampler.service.properties";
@@ -47,7 +47,7 @@ public class SamplerInitilizer {
         static {
             Pattern pattern = Pattern.compile("^(0|1|1.0|(0\\.\\d+))$");
 
-            for (SamplerInitilizer.SamplerType type : SamplerInitilizer.SamplerType.values()) {
+            for (SamplerInitializer.SamplerType type : SamplerInitializer.SamplerType.values()) {
                 Map<String, Sampler> samplerConfig = type.config;
                 Object obj = YamlUitl.get(type);
 

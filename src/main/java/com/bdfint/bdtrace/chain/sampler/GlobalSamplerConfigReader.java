@@ -1,6 +1,6 @@
 package com.bdfint.bdtrace.chain.sampler;
 
-import com.bdfint.bdtrace.util.SamplerInitilizer;
+import com.bdfint.bdtrace.util.SamplerInitializer;
 import com.github.kristofa.brave.Sampler;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public class GlobalSamplerConfigReader extends AbstractSamplerConfigReader {
      * @return
      */
     @Override
-    public SamplerInitilizer.SamplerType type() {
-        return SamplerInitilizer.SamplerType.GLOBAL_SAMPLER_PATH;
+    public SamplerInitializer.SamplerType type() {
+        return SamplerInitializer.SamplerType.GLOBAL_SAMPLER_PATH;
     }
 }

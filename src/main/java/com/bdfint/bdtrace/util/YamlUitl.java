@@ -20,14 +20,14 @@ public class YamlUitl {
         YAML_MAP = (Map) yaml.load(inputStream);
     }
 
-    public static Object get(SamplerInitilizer.SamplerType type) {
+    public static Object get(SamplerInitializer.SamplerType type) {
         return YAML_MAP.get(type.toString());
     }
 
     public static void main(String[] args) {
-        Object o = get(SamplerInitilizer.SamplerType.METHOD_SAMPLER_PATH);
+        Object o = get(SamplerInitializer.SamplerType.METHOD_SAMPLER_PATH);
         System.out.println(o);
-        for (SamplerInitilizer.SamplerType type : SamplerInitilizer.SamplerType.values()) {
+        for (SamplerInitializer.SamplerType type : SamplerInitializer.SamplerType.values()) {
             System.out.println(type.getConfig());
         }
     }

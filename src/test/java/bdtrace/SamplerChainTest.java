@@ -5,7 +5,7 @@ import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.function.ServiceInfoProvider;
 import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
-import com.bdfint.bdtrace.util.SamplerInitilizer;
+import com.bdfint.bdtrace.util.SamplerInitializer;
 import com.github.kristofa.brave.Sampler;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,8 +24,8 @@ public class SamplerChainTest {
 
     static {
         CONFIG = new ConcurrentHashMap<>();
-        for (SamplerInitilizer.SamplerType type : SamplerInitilizer.SamplerType.values()) {
-            CONFIG.put(type.toString(), SamplerInitilizer.init(type));
+        for (SamplerInitializer.SamplerType type : SamplerInitializer.SamplerType.values()) {
+            CONFIG.put(type.toString(), SamplerInitializer.init(type));
         }
     }
 

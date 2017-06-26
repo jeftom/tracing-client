@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.util.Map;
 
 /**
- * SamplerInitilizer Tester.
+ * SamplerInitializer Tester.
  *
  * @author <Authors name>
  * @version 1.0
@@ -20,15 +20,15 @@ public class SamplerInitilizerTest {
     @Test
     public void testInit() throws Exception {
 
-        Map<String, Sampler> init = SamplerInitilizer.init();
+        Map<String, Sampler> init = SamplerInitializer.init();
         System.out.println(init);
-        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.METHOD_SAMPLER_PATH);
+        init = SamplerInitializer.init(SamplerInitializer.SamplerType.METHOD_SAMPLER_PATH);
         System.out.println(init);
-        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.GROUP_SAMPLER_PATH);
+        init = SamplerInitializer.init(SamplerInitializer.SamplerType.GROUP_SAMPLER_PATH);
         System.out.println(init);
-        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.APPLICATION_SAMPLER_PATH);
+        init = SamplerInitializer.init(SamplerInitializer.SamplerType.APPLICATION_SAMPLER_PATH);
         System.out.println(init);
-        init = SamplerInitilizer.init(SamplerInitilizer.SamplerType.GLOBAL_SAMPLER_PATH);
+        init = SamplerInitializer.init(SamplerInitializer.SamplerType.GLOBAL_SAMPLER_PATH);
         System.out.println(init);
 
 
