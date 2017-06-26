@@ -37,7 +37,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected AnnotatedImpl annotated = new AnnotatedImpl();
     protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
-    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameCacheProcessor();
+    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
 
     //field
     protected StatusEnum status = StatusEnum.OK;

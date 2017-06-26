@@ -45,6 +45,7 @@ public abstract class AbstractSamplerConfigReader implements ConfigReader, Curre
         if (conditionOnNextSampling(config)) {//如果不需要采样，就读取下一个配置文件
             samplerResult.setSampled(false);
             chain.readForAll(samplerResult);
+            return;
         }
         readForThis(config, samplerResult, chain);
     }
@@ -59,7 +60,7 @@ public abstract class AbstractSamplerConfigReader implements ConfigReader, Curre
     protected boolean readForThis(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain) {
         boolean sampled = config.get(getInterface()).isSampled(0);
         samplerResult.setSampled(sampled);
-        logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), sampled);
+        logger.debug("当前采样接口名称：{}, 采样：{}", getInterface(), sampled);
         return true;
 //        logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), true);
 //        return false;
