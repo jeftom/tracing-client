@@ -19,12 +19,12 @@ service:
 
 group:
   logistic.x: 0.05
-  logistic.y: 0.05
+  logistic.y: 0.06
 
 application:
-  logistic: 0.05
+  logistic: 0.07
 
-global: 0.05 #允许单个值
+global: 0.08 #允许单个值
 
 #---
 #
