@@ -1,22 +1,28 @@
-# 以下五类采样率可分别设置，查找顺序为method->servcie->group->application->global , 范围是 0.01 - 1.0
+# 以下五类采样率可分别设置，查找顺序为method->service->group->application->global , 范围是 0.01 - 1.0
 method:
-  com.bdfint.bdtrace.service.Buy.buy : 0.1
-  com.bdfint.bdtrace.service.BuyA.buyA : 0.2
-  com.bdfint.bdtrace.service.BuyB.buyB : 0.3
-  com.bdfint.bdtrace.service.BuyAA.buyAA : 0.4
-  com.bdfint.bdtrace.service.BuyAB.buyAB : 0.5
+  logistic.x.com.bdfint.bdtrace.service.Buy.buy : 0.1
+  logistic.x.com.bdfint.bdtrace.service.BuyA.buyA : 0.2
+  logistic.x.com.bdfint.bdtrace.service.BuyB.buyB : 0.3
+  logistic.x.com.bdfint.bdtrace.service.BuyAA.buyAA : 0.4
+  logistic.x.com.bdfint.bdtrace.service.BuyAB.buyAB : 0.5
 
 service:
   # 服务
-  com.bdfint.bdtrace.service.Buy : 0.1
-  com.bdfint.bdtrace.service.BuyA : 0.2
-  com.bdfint.bdtrace.service.BuyB : 0.3
-  com.bdfint.bdtrace.service.BuyAA : 0.4
-  com.bdfint.bdtrace.service.BuyAB : 0.5
-  com.bdfint.bdtrace.service.BuyABA : 0.6
-  com.bdfint.bdtrace.service.BuyABB : 0.7
+  logistic.x.com.bdfint.bdtrace.service.Buy : 0.1
+  logistic.y.com.bdfint.bdtrace.service.BuyA : 0.2
+  logistic.x.com.bdfint.bdtrace.service.BuyB : 0.3
+  logistic.y.com.bdfint.bdtrace.service.BuyAA : 0.4
+  logistic.x.com.bdfint.bdtrace.service.BuyAB : 0.5
+  logistic.y.com.bdfint.bdtrace.service.BuyABA : 0.6
+  logistic.x.com.bdfint.bdtrace.service.BuyABB : 0.7
 
-#  logistic: 0.05
+
+group:
+  logistic.x: 0.05
+  logistic.y: 0.05
+
+application:
+  logistic: 0.05
 
 global: 0.05 #允许单个值
 

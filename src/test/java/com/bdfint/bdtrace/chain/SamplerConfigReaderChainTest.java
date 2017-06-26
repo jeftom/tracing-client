@@ -1,6 +1,10 @@
 package com.bdfint.bdtrace.chain;
 
 import com.bdfint.bdtrace.bean.SamplerResult;
+import com.bdfint.bdtrace.chain.sampler.AbstractSamplerConfigReader;
+import com.bdfint.bdtrace.chain.sampler.GlobalSamplerConfigReader;
+import com.bdfint.bdtrace.chain.sampler.SamplerConfigReaderChain;
+import com.bdfint.bdtrace.chain.sampler.ServiceSamplerConfigReader;
 import com.bdfint.bdtrace.util.Configuration;
 import org.junit.After;
 import org.junit.Assert;

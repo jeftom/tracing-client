@@ -1,5 +1,7 @@
-package com.bdfint.bdtrace.chain;
+package com.bdfint.bdtrace.chain.sampler;
 
+import com.bdfint.bdtrace.chain.ConfigReader;
+import com.bdfint.bdtrace.chain.ConfigReader_Config;
 import com.bdfint.bdtrace.util.SamplerInitilizer;
 import com.github.kristofa.brave.Sampler;
 

@@ -34,8 +34,10 @@ public interface ServiceInfoProvidable extends SpanNameProvidable {
     /**
      * 方法名
      * @return
+     * @param invoker
+     * @param invocation
      */
-    String methodName();
+    String methodName(Invoker<?> invoker, Invocation invocation);
     /**
      * 获取服务名
      *

@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
  * @date 2017/5/24.
  * @desriptioin
  */
-public class ServiceInfoProvider implements ServiceInfoProvidable {
-    private static final Logger logger = LoggerFactory.getLogger(ServiceInfoProvider.class);
+public class SamplerInfoProvider implements ServiceInfoProvidable {
+    private static final Logger logger = LoggerFactory.getLogger(SamplerInfoProvider.class);
 
     @Override
     public String applicationName() {
@@ -31,7 +31,8 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
      */
     @Override
     public String group() {
-        return RpcContext.getContext().getUrl().getParameter("group","0");
+        String group = RpcContext.getContext().getUrl().getParameter("group", "0");
+        return applicationName() + "." + group;
     }
 
     /**
@@ -41,26 +42,30 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
      */
     @Override
     public String version() {
-        return RpcContext.getContext().getUrl().getParameter("version", "1.0");
+        String version = RpcContext.getContext().getUrl().getParameter("version", "1.0");
+        return version;
+
     }
+
 
     /**
      * 方法名
      *
-     * @return
      * @param invoker
      * @param invocation
+     * @return
      */
     @Override
     public String methodName(Invoker<?> invoker, Invocation invocation) {
         RpcContext context = RpcContext.getContext();
         String methodName = context.getMethodName();
-        return methodName;
+        return serviceName(invoker, invocation) + "." + methodName;
     }
 
     @Override
     public String serviceName(Invoker<?> invoker, Invocation invocation) {
-        return applicationName() + "-" + invoker.getInterface().getSimpleName();
+        String s = applicationName() + "-" + invoker.getInterface().getSimpleName();
+        return group() + "." + s;
     }
 
     /**

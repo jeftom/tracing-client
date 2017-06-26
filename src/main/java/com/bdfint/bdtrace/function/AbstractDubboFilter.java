@@ -5,6 +5,7 @@ import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.chain.*;
+import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
 import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
@@ -71,7 +72,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
 
         //采样处理
-        readers[0].setInterface(serviceInfoProvidable.methodName());
+        readers[0].setInterface(serviceInfoProvidable.methodName(invoker, invocation));
         readers[1].setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
         readers[2].setInterface(serviceInfoProvidable.group());
         readers[3].setInterface(serviceInfoProvidable.applicationName());

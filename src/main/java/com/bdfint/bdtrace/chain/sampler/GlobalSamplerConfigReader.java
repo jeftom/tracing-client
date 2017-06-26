@@ -1,4 +1,4 @@
-package com.bdfint.bdtrace.chain;
+package com.bdfint.bdtrace.chain.sampler;
 
 import com.bdfint.bdtrace.function.DefaultGlobalSampler;
 import com.bdfint.bdtrace.functionable.GlobalSampler;
@@ -17,7 +17,7 @@ public class GlobalSamplerConfigReader extends AbstractSamplerConfigReader {
     private static final GlobalSampler GLOBAL_SAMPLER = new DefaultGlobalSampler();
 
     @Override
-    protected boolean conditionOnNotSampling(Map<String, Sampler> config) {
+    protected boolean conditionOnNextSampling(Map<String, Sampler> config) {
         return !config.values().iterator().next().isSampled(0);
     }
 
