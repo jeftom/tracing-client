@@ -5,7 +5,7 @@ import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.bean.StatusEnum;
-import com.bdfint.bdtrace.chain.*;
+import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
 import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
@@ -70,10 +70,16 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         Test.testServiceName(serviceName);
     }
 
+    /**
+     * 事实证明 在同一application下的dubbo环境中，filter是单例单例单例的，至少在只有一对一的情况下是这样子的。。
+     *
+     * @param invoker
+     * @param invocation
+     * @return
+     * @throws RpcException
+     */
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
-
-        System.out.println("hashCode ="+this);
 
         //采样处理
         chain.reset();
@@ -162,13 +168,15 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
      */
     public Throwable handleAndGetException(Result result, String serviceName) {
         if (result.hasException()) {
+            status = StatusEnum.ERROR;
             logger.error("======================TRACING CLIENT Exception=====================");
-//                result.getException().printStackTrace();
             logger.error("serviceName: {}, class: {}", serviceName, this);
             logger.error("Exception info {}", result.getException());
-            status = StatusEnum.ERROR;
-//            return new Throwable("远程方法系统异常", result.getException());
             logger.error("远程方法系统异常");
+            logger.error("======================TRACING CLIENT Exception=====================");
+            logger.error("");
+//            return new Throwable("远程方法系统异常", result.getException());
+//                result.getException().printStackTrace();
             return result.getException();
         }
         return null;

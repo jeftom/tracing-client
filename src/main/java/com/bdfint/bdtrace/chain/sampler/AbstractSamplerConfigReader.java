@@ -31,15 +31,22 @@ public abstract class AbstractSamplerConfigReader implements ConfigReader, Curre
     }
 
 
+    /**
+     * 当且仅当没有当前reader的配置时，才读取下一个；否则，读取当前的
+     *
+     * @param config        配置
+     * @param samplerResult
+     * @param chain         @return
+     */
     @Override
     public void read(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain) {
         Assert.assertNotNull(samplerResult);
 
-        readForThis(config, samplerResult, chain);
         if (conditionOnNextSampling(config)) {//如果不需要采样，就读取下一个配置文件
             samplerResult.setSampled(false);
             chain.readForAll(samplerResult);
         }
+        readForThis(config, samplerResult, chain);
     }
 
     protected boolean conditionOnNextSampling(Map<String, Sampler> config) {
@@ -50,14 +57,11 @@ public abstract class AbstractSamplerConfigReader implements ConfigReader, Curre
 //    protected abstract boolean readForThis(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain);
 
     protected boolean readForThis(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain) {
-        if (!conditionOnNextSampling(config)) {
-            boolean sampled = config.get(getInterface()).isSampled(0);
-            samplerResult.setSampled(sampled);
-            logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), sampled);
-            return sampled;
-        }
-
-        logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), true);
-        return false;
+        boolean sampled = config.get(getInterface()).isSampled(0);
+        samplerResult.setSampled(sampled);
+        logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), sampled);
+        return true;
+//        logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), true);
+//        return false;
     }
 }
