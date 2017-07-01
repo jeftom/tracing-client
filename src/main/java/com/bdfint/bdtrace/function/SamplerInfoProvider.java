@@ -31,8 +31,8 @@ public class SamplerInfoProvider implements ServiceInfoProvidable {
      */
     @Override
     public String group() {
-        String group = RpcContext.getContext().getUrl().getParameter("group", "0");
-        return group == null ? null : applicationName() + "." + group;
+        String group = RpcContext.getContext().getUrl().getParameter("group");
+        return group == null ? applicationName() : applicationName() + "." + group;
     }
 
 
@@ -43,7 +43,7 @@ public class SamplerInfoProvider implements ServiceInfoProvidable {
      */
     @Override
     public String version() {
-        String version = RpcContext.getContext().getUrl().getParameter("version", "1.0");
+        String version = RpcContext.getContext().getUrl().getParameter("version");
         return version;
 
     }
@@ -60,13 +60,13 @@ public class SamplerInfoProvider implements ServiceInfoProvidable {
     public String methodName(Invoker<?> invoker, Invocation invocation) {
         RpcContext context = RpcContext.getContext();
         String methodName = context.getMethodName();
-        return serviceName(invoker, invocation) + "." + methodName;
+        return uniqueInterfaceKey(invoker, invocation) + "." + methodName;
     }
 
     @Override
     public String serviceName(Invoker<?> invoker, Invocation invocation) {
-        String s = applicationName() + "-" + invoker.getInterface().getSimpleName();
-        return group() == null ? s : "." + s;
+        String s = invoker.getInterface().getSimpleName();
+        return group() + "." + s;
     }
 
     /**
@@ -92,7 +92,7 @@ public class SamplerInfoProvider implements ServiceInfoProvidable {
             key = name + "." + methodName;
         }
 
-        return name;
+        return group() + "." + name;
     }
 
     @Override
