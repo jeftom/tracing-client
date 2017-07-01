@@ -2,7 +2,7 @@
 <configuration>
     <property name="logPath" value="./logs"/>
     <property name="logLevel" value="DEBUG"/>
-    <property name="outPattern" value="%d{yyyy/MM/dd-HH:mm:ss} %level [%thread] [%logger{16}] - %m%n" />
+    <property name="outPattern" value="%d{yyyy/MM/dd-HH:mm:ss} %level [%logger{14}] - %m%n" />
     <property name="maxHistory" value="7" />
     <property name="charSet" value="UTF-8" />
 

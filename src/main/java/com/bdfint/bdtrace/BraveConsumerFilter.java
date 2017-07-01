@@ -27,7 +27,7 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
             result = super.invoke(invoker, invocation);
         } catch (RpcException e) {
             result = invoker.invoke(invocation);
-            logger.error("RPC异常，忽略本次追踪。", e);
+            logger.error("RPC Consumer 端异常，忽略本次追踪。", e);
         }
         return result;
     }

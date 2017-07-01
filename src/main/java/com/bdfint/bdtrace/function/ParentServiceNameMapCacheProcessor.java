@@ -25,7 +25,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
 
     private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
-    private static int sInternal = 3 * 1000; // unit is ms
+    private static int sInternal = 30 * 1000; // unit is ms
 
     public ParentServiceNameMapCacheProcessor() {
         clearTask();
@@ -59,7 +59,6 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
             logger.error("ERROR CACHE get null object. which means no CACHE set but try to get.");
         return localSpanId;
 
-
     }
 
     public boolean clearCache() {
@@ -87,7 +86,6 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         SERVICE.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                System.out.println(System.currentTimeMillis());
                 clearCache();
             }
         }, sInternal, sInternal, TimeUnit.MILLISECONDS);

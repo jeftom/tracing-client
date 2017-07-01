@@ -1,4 +1,5 @@
 # 以下五类采样率可分别设置，查找顺序为method->service->group->application->global , 范围是 0.01 - 1.0
+# 如果没有group,则不写如method
 method:
   logistic.x.com.bdfint.bdtrace.service.Buy.buy : 0.1
   logistic.x.com.bdfint.bdtrace.service.BuyA.buyA : 0.2
@@ -17,6 +18,7 @@ service:
   logistic.x.com.bdfint.bdtrace.service.BuyABB : 0.7
 
 
+  #如果没有分组，则不写，连group一起删掉
 group:
   logistic.x: 0.05
   logistic.y: 0.06

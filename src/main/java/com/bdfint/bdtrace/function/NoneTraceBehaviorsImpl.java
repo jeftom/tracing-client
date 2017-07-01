@@ -16,7 +16,6 @@ public class NoneTraceBehaviorsImpl implements NoneTraceBehaviors {
         if ("com.alibaba.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
             return true;
         }
-//        status = StatusEnum.OK;
         if ("0".equals(invocation.getAttachment(DubboTraceConst.SAMPLED))
                 || "false".equalsIgnoreCase(invocation.getAttachment(DubboTraceConst.SAMPLED))
                 || "null".equalsIgnoreCase(invocation.getAttachment(DubboTraceConst.SAMPLED))) {

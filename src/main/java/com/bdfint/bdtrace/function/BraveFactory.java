@@ -18,6 +18,7 @@ import zipkin.reporter.Sender;
 import zipkin.reporter.okhttp3.OkHttpSender;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -35,7 +36,8 @@ public class BraveFactory {
     //static
 //    private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
 //    private static Sampler sSampler = new BraveFactory().sampler;
-    private final static Map<String, Brave> CACHE = new HashMap<String, Brave>();
+    private final static LinkedHashMap<String, Brave> CACHE = new LinkedHashMap<>();
+    private final static int MAX_SIZE = 20;
     //field
 //    private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
 //    private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
@@ -47,10 +49,13 @@ public class BraveFactory {
         try {
             if (CACHE.containsKey(serviceName)) {
                 brave = CACHE.get(serviceName);
+            } else {
+                brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(SAMPLER).build();
+                if (brave != null){
+                    CACHE.put(serviceName, brave);
+                    // TODO CACHE.size() == MAX_SIZE ? CACHE.
+                }
             }
-            brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(SAMPLER).build();
-            if (brave != null)
-                CACHE.put(serviceName, brave);
         } catch (Exception e) {
             logger.info("异常信息：", e);
         } finally {

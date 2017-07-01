@@ -9,7 +9,6 @@ import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
 import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
-import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
 import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
 import com.bdfint.bdtrace.test.Test;
 import com.github.kristofa.brave.*;
@@ -37,16 +36,17 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected AnnotatedImpl annotated = new AnnotatedImpl();
     protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
-    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
+    protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
+//    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
+    protected ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
 
     //field
     protected StatusEnum status = StatusEnum.OK;
     protected String serviceName;
     protected String spanName;
-    //    protected String errType = null;
-//    protected String errMsg = null;
     protected Throwable exception;
-    ServiceSamplerConfigReader serviceSamplerConfigReader = new ServiceSamplerConfigReader();
+
+    //for sampler
     AbstractSamplerConfigReader[] readers = {
             new MethodSamplerConfigReader(),
             new ServiceSamplerConfigReader(),
@@ -55,7 +55,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             new GlobalSamplerConfigReader()
     };
     SamplerResult samplerResult = new SamplerResult();
-    AbstractSamplerConfigReader reader = new GlobalSamplerConfigReader();
     ReaderChain chain = new SamplerConfigReaderChain();
 
     public AbstractDubboFilter() {
@@ -67,7 +66,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
         spanName = serviceInfoProvidable.spanName(invoker, invocation);
         setInterceptors(serviceName);
-        Test.testServiceName(serviceName);
+//        Test.testServiceName(serviceName);
     }
 
     /**
@@ -83,10 +82,10 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
         //采样处理
         chain.reset();
-        readers[0].setInterface(serviceInfoProvidable.methodName(invoker, invocation));
-        readers[1].setInterface(serviceInfoProvidable.uniqueInterfaceKey(invoker, invocation));
-        readers[2].setInterface(serviceInfoProvidable.group());
-        readers[3].setInterface(serviceInfoProvidable.applicationName());
+        readers[0].setInterface(samplerInfoProvider.methodName(invoker, invocation));
+        readers[1].setInterface(samplerInfoProvider.uniqueInterfaceKey(invoker, invocation));
+        readers[2].setInterface(samplerInfoProvider.group());
+        readers[3].setInterface(samplerInfoProvider.applicationName());
         readers[4].setInterface(DubboTraceConst.GLOBAL_SAMPLER_KEY);
 
         chain.readForAll(samplerResult);

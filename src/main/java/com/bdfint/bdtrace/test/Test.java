@@ -1,6 +1,8 @@
 package com.bdfint.bdtrace.test;
 
 import org.slf4j.Logger;
+import zipkin.Span;
+import zipkin.reporter.Reporter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +41,7 @@ public class Test {
 
     public static void main(String[] args) {
 //        testForParentChildrenRelationship("BuyABB.buyAB", "BuyABB.buyAB");
-        System.out.println(100000 / 1000.0);
+        Reporter.CONSOLE.report(Span.builder().traceId(0L).id(0L).build());
     }
 
     static class Entry {
