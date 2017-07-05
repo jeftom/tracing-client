@@ -43,6 +43,11 @@ public class BraveFactory {
 //    private final AsyncReporter<zipkin.Span> reporter = AsyncReporter.builder(sender).build();
 //    private final Sampler sampler = Sampler.create(Configuration.getSampler());
 
+    /**
+     *  serviceName should be the same when using at the same endpoint
+     * @param serviceName
+     * @return
+     */
     public static Brave nullableInstance(String serviceName) {
 
         Brave brave = null;

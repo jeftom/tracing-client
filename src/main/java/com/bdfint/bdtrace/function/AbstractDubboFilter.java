@@ -10,7 +10,6 @@ import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
 import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
 import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
-import com.bdfint.bdtrace.test.Test;
 import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +115,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 //            throw new RuntimeException(e.getCause());
         } finally {
             afterHandle(invocation);//template method
-            Test.testServiceName(serviceName);
             return result;
         }
     }
@@ -140,7 +138,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         //if there is no CACHE
         if (localSpanId != null) {
             String parentSpanServiceName = localSpanId.getParentSpanServiceName();
-            Test.testForParentChildrenRelationship(parentSpanServiceName, serviceName, logger);
             setInterceptors(parentSpanServiceName);
         }
 

@@ -36,11 +36,11 @@ public class SamplerInitilizerxxx {
     }
 
     enum SamplerType {
-        METHOD_SAMPLER_PATH("sampler.method.properties", new ConcurrentHashMap<>()),
-        SERVICE_SAMPLER_PATH("sampler.service.properties", new ConcurrentHashMap<>()),
-        GROUP_SAMPLER_PATH("sampler.group.properties", new ConcurrentHashMap<>()),
-        APPLICATION_SAMPLER_PATH("sampler.application.properties", new ConcurrentHashMap<>()),
-        GLOBAL_SAMPLER_PATH("sampler.global.properties", new ConcurrentHashMap<>());
+        METHOD_SAMPLER_PATH("sample/sampler.method.properties", new ConcurrentHashMap<>()),
+        SERVICE_SAMPLER_PATH("sample/sampler.service.properties", new ConcurrentHashMap<>()),
+        GROUP_SAMPLER_PATH("sample/sampler.group.properties", new ConcurrentHashMap<>()),
+        APPLICATION_SAMPLER_PATH("sample/sampler.application.properties", new ConcurrentHashMap<>()),
+        GLOBAL_SAMPLER_PATH("sample/sampler.global.properties", new ConcurrentHashMap<>());
 
         static {
 
