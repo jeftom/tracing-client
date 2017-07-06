@@ -20,8 +20,6 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        if (!RpcContext.getContext().isConsumerSide())
-            logger.error("ERROR ! NOT consumer but enter consumer filter");
         Result result = null;
         try {
             result = super.invoke(invoker, invocation);

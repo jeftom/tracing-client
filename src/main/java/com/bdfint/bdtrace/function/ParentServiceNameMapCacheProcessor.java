@@ -18,14 +18,13 @@ import java.util.concurrent.TimeUnit;
  * @desriptioin
  */
 public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCacheProcessing {
+    private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
+    private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
     /**
      * CACHE for parent service
      */
-    protected static final Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
-
-    private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
-    private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
-    private static int sInternal = 30 * 1000; // unit is ms
+    protected static volatile Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
+    private static int sInternal = 3 * 1000; // unit is ms
 
     public ParentServiceNameMapCacheProcessor() {
         clearTask();
@@ -38,6 +37,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
     @Override
     public void setParentServiceName(String serviceName, SpanId spanId) {
         CACHE.put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()));
+        logger.debug("缓存设置成功，spanId is {},serviceName is {}", spanId.spanId, serviceName);
     }
 
     @Override
@@ -57,6 +57,8 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
 //            Test.testForParentChildrenRelationship(parentSpanServiceName, serviceName);
         if (localSpanId == null)
             logger.error("ERROR CACHE get null object. which means no CACHE set but try to get.");
+
+        logger.debug("获取缓存 {}", spanId.parentId);
         return localSpanId;
 
     }
@@ -67,10 +69,10 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         for (Map.Entry<Long, LocalSpanId> entry : spanIdMap.entrySet()) {
             LocalSpanId value = entry.getValue();
             long elapse = System.currentTimeMillis() - value.getTime();
-            logger.debug("已生存" + elapse + "ms");
+            logger.debug("缓存@{} 已生存 {} ms", value.getParentSpanId(), elapse);
             if (elapse >= sInternal) {
                 spanIdMap.remove(entry.getKey());
-                logger.debug("cache {} has been clear", entry.getValue().getParentSpanServiceName());
+                logger.debug("缓存 {} has been clear",value.getParentSpanId());
                 hasEntryRemoved = true;
             }
         }

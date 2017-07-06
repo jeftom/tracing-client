@@ -8,7 +8,7 @@ import com.alibaba.dubbo.rpc.Invoker;
  * @date 2017/5/24.
  * @desriptioin
  */
-public interface NoneTraceBehaviors {
+public interface ServerTraceIgnoredBehaviors {
 
     /**
      * 决定当前调用是否被忽略
@@ -16,5 +16,5 @@ public interface NoneTraceBehaviors {
      * @param invocation
      * @return
      */
-    boolean ignoreTrace(Invoker<?> invoker, Invocation invocation);
+    boolean ignore(Invoker<?> invoker, Invocation invocation);
 }

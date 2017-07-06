@@ -42,12 +42,21 @@ public class ParentServiceNameCacheProcessorTest {
 //        }, sInternal, sInternal, TimeUnit.MILLISECONDS);
 //        test.testGetParentLocalSpanId();
 
-        processor.setParentServiceName("1", SpanId.builder().traceId(1).spanId(1).build());
-        processor.setParentServiceName("2", SpanId.builder().traceId(1).spanId(2).parentId(1L).build());
-        processor.setParentServiceName("2", SpanId.builder().traceId(1).spanId(2).parentId(1L).build());
-        processor.setParentServiceName("3", SpanId.builder().traceId(1).spanId(3).parentId(1L).build());
-        processor.setParentServiceName("4", SpanId.builder().traceId(1).spanId(4).parentId(2L).build());
-        processor.setParentServiceName("5", SpanId.builder().traceId(1).spanId(5).parentId(3L).build());
+        new Thread(() -> {
+            processor.setParentServiceName("1", SpanId.builder().traceId(1).spanId(1).build());
+        }).start();
+        new Thread(() -> {
+            processor.setParentServiceName("5", SpanId.builder().traceId(1).spanId(5).parentId(3L).build());
+        }).start();
+        new Thread(() -> {
+            processor.setParentServiceName("2", SpanId.builder().traceId(1).spanId(2).parentId(1L).build());
+        }).start();
+        new Thread(() -> {
+            processor.setParentServiceName("3", SpanId.builder().traceId(1).spanId(3).parentId(1L).build());
+        }).start();
+        new Thread(() -> {
+            processor.setParentServiceName("4", SpanId.builder().traceId(1).spanId(4).parentId(2L).build());
+        }).start();
     }
 
     @Before

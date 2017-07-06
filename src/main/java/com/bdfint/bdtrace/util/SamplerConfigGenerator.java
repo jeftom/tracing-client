@@ -43,19 +43,12 @@ public class SamplerConfigGenerator {
             if (bean.getClass().getCanonicalName().equals(APPLICATION_TYPE)) {
                 application.add(beanName);
                 conf.put(beanName, defaultSampler);
+                addMethod(beanName, bean);
             }
             if (bean.getClass().getCanonicalName().equals(SERVICE_TYPE)) {
                 service.add(beanName);
                 conf1.put(beanName, defaultSampler);
-            }
-            Method[] methods = bean.getClass().getDeclaredMethods();
-            System.out.println(beanName + "{");
-            for (Method m : methods) {
-                if (!m.getName().equals("$echo")) {
-                    conf2.put(m.getName(), defaultSampler);
-                    method.add(m.getName());
-                }
-                System.out.println("    " + m.getName() + ", ");
+                addMethod(beanName, bean);
             }
             System.out.println("}");
             System.out.println(beanName + "->" + bean.getClass());
@@ -68,6 +61,18 @@ public class SamplerConfigGenerator {
         map.put("application", conf);
         map.put("service", conf1);
         map.put("method", conf2);
+    }
+
+    public static void addMethod(String beanName, Object bean) {
+        Method[] methods = bean.getClass().getDeclaredMethods();
+        System.out.println(beanName + "{");
+        for (Method m : methods) {
+            if (!m.getName().equals("$echo")) {
+                conf2.put(m.getName(), defaultSampler);
+                method.add(m.getName());
+            }
+            System.out.println("    " + m.getName() + ", ");
+        }
     }
 
     public static void appendModule(String key, List<String> configModule) {

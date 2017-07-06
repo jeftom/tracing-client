@@ -50,7 +50,6 @@ public class AttachmentTransmission implements AttachmentTransmittable {
         if (spanId == null) {
             headers.put(DubboTraceConst.SAMPLED, DubboTraceConst.UN_SAMPLE_STATUS);
         } else {
-            spanId.sampled();
             headers.put(DubboTraceConst.SAMPLED, String.valueOf(spanId.sampled()));
             headers.put(DubboTraceConst.TRACE_ID, IdConversion.convertToString(spanId.traceId));
             headers.put(DubboTraceConst.SPAN_ID, IdConversion.convertToString(spanId.spanId));

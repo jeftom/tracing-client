@@ -9,7 +9,7 @@ import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
-import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
+import com.bdfint.bdtrace.functionable.ServerTraceIgnoredBehaviors;
 import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
 import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
@@ -37,11 +37,12 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     // interface dependencies and impl.
     protected AnnotatedImpl annotated = new AnnotatedImpl();
-    protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
+    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
     protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
-    //    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
-    protected ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
+
+//    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
+    protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
 
     //field
     protected StatusEnum status = StatusEnum.OK;
@@ -50,7 +51,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected Throwable exception;
 
     //for sampler
-    AbstractSamplerConfigReader[] readers = {
+    static AbstractSamplerConfigReader[] readers = {
             new MethodSamplerConfigReader(),
             new ServiceSamplerConfigReader(),
             new GroupSamplerConfigReader(),
@@ -58,7 +59,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             new GlobalSamplerConfigReader()
     };
     SamplerResult samplerResult = new SamplerResult();
-    ReaderChain chain = new SamplerConfigReaderChain();
+    static ReaderChain chain = new SamplerConfigReaderChain();
 
     public AbstractDubboFilter() {
         chain.addReaders(readers);
@@ -73,7 +74,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     }
 
     /**
-     * 事实证明 在同一application下的dubbo环境中，filter是单例单例单例的，至少在只有一对一的情况下是这样子的。。
+     * 事实证明 在同一application下的dubbo环境中，filter是<b>单例</b>的，至少在只有一对一的情况下是这样子的。。
      *
      * @param invoker
      * @param invocation
@@ -82,6 +83,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
      */
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
+        logger.debug("当前的dubbo filter hashcode={}",this);
 
         //采样处理
         chain.reset();
@@ -97,7 +99,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         }
 
         //ignore this trace when sample is 0 or null
-        if (noneTraceBehaviors.ignoreTrace(invoker, invocation))
+        if (noneTraceBehaviors.ignore(invoker, invocation))
             return invoker.invoke(invocation);
 
         //template method
@@ -115,8 +117,8 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             exception = handleAndGetException(result, serviceName); //template method
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
-            exception = new Throwable("dubbo RPC调用异常", e);
-//            throw new RuntimeException(e.getCause());
+//            exception = new Throwable("dubbo RPC调用异常", e);
+            exception = e;
         } finally {
             afterHandle(invocation);//template method
             return result;

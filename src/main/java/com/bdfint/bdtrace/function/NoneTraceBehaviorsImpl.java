@@ -3,16 +3,16 @@ package com.bdfint.bdtrace.function;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.bdfint.bdtrace.bean.DubboTraceConst;
-import com.bdfint.bdtrace.functionable.NoneTraceBehaviors;
+import com.bdfint.bdtrace.functionable.ServerTraceIgnoredBehaviors;
 
 /**
  * @author heyb
  * @date 2017/5/24.
  * @desriptioin
  */
-public class NoneTraceBehaviorsImpl implements NoneTraceBehaviors {
+public class NoneTraceBehaviorsImpl implements ServerTraceIgnoredBehaviors {
     @Override
-    public boolean ignoreTrace(Invoker<?> invoker, Invocation invocation) {
+    public boolean ignore(Invoker<?> invoker, Invocation invocation) {
         if ("com.alibaba.dubbo.monitor.MonitorService".equals(invoker.getInterface().getName())) {
             return true;
         }
