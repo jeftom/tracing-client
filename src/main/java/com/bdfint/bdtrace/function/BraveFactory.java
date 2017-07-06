@@ -44,21 +44,35 @@ public class BraveFactory {
 //    private final Sampler sampler = Sampler.create(Configuration.getSampler());
 
     /**
-     *  serviceName should be the same when using at the same endpoint
+     * serviceName should be the same when using at the same endpoint
+     *
      * @param serviceName
      * @return
      */
     public static Brave nullableInstance(String serviceName) {
+        return nullableInstance(serviceName, SAMPLER);
+    }
+
+    /**
+     * 为指定类别的服务定制采样率,这里须有缓存较好
+     *
+     * @param serviceName
+     * @param sampler
+     * @return
+     */
+    public static Brave nullableInstance(String serviceName, Sampler sampler) {
 
         Brave brave = null;
         try {
             if (CACHE.containsKey(serviceName)) {
                 brave = CACHE.get(serviceName);
             } else {
-                brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(SAMPLER).build();
-                if (brave != null){
+                brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(sampler).build();
+                if (brave != null) {
                     CACHE.put(serviceName, brave);
                     // TODO CACHE.size() == MAX_SIZE ? CACHE.
+                } else {
+                    logger.error("brave 初始化失败，serviceName:{}", serviceName);
                 }
             }
         } catch (Exception e) {

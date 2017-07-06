@@ -1,6 +1,7 @@
 package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
+import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.SamplerResult;
@@ -14,6 +15,9 @@ import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -36,7 +40,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected NoneTraceBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
     protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
-//    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
+    //    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
     protected ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
 
     //field
@@ -145,11 +149,9 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     protected void setInterceptors(String serviceName) {
         if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
-            logger.error("brave 初始化失败，serviceName:{}", serviceName);
             return;
         }
 
-//        Brave brave = BraveFactory.nullableInstance(serviceName);
         this.clientRequestInterceptor = brave.clientRequestInterceptor();
         this.clientResponseInterceptor = brave.clientResponseInterceptor();
         this.serverRequestInterceptor = brave.serverRequestInterceptor();
@@ -176,5 +178,33 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             return result.getException();
         }
         return null;
+    }
+
+    private void setSampled(DubboClientRequestAdapter clientRequestAdapter, boolean sampled) {
+        try {
+            Field field = ClientRequestInterceptor.class.getDeclaredField("clientTracer");
+            field.setAccessible(true);
+            ClientTracer clientTracer = (ClientTracer) field.get(clientRequestInterceptor);
+            try {
+                Method serverSpan = ClientTracer.class.getDeclaredMethod("currentServerSpan", ServerSpanThreadBinder.class);
+                serverSpan.setAccessible(true);
+                ServerSpanThreadBinder invoke = ((ServerSpanThreadBinder) serverSpan.invoke(clientTracer));
+                ServerSpan currentServerSpan = invoke.getCurrentServerSpan();
+                Method spanId = ServerSpan.class.getDeclaredMethod("spanId");
+                spanId.setAccessible(true);
+                SpanId Id = ((SpanId) spanId.invoke(currentServerSpan));
+
+
+
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchFieldException e) {
+            logger.info("异常信息：", e);
+        } catch (IllegalAccessException e) {
+            logger.info("异常信息：", e);
+        }
     }
 }
