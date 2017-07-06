@@ -2,7 +2,6 @@ package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
-import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.bean.StatusEnum;
@@ -37,7 +36,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     // interface dependencies and impl.
     protected AnnotatedImpl annotated = new AnnotatedImpl();
-    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
+    protected ServerTraceIgnoredBehaviors serverTraceIgnoredBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
     protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
 
@@ -85,21 +84,21 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
         logger.debug("当前的dubbo filter hashcode={}",this);
 
-        //采样处理
-        chain.reset();
-        readers[0].setInterface(samplerInfoProvider.methodName(invoker, invocation));
-        readers[1].setInterface(samplerInfoProvider.uniqueInterfaceKey(invoker, invocation));
-        readers[2].setInterface(samplerInfoProvider.group());
-        readers[3].setInterface(samplerInfoProvider.applicationName());
-        readers[4].setInterface(DubboTraceConst.GLOBAL_SAMPLER_KEY);
-
-        chain.readForAll(samplerResult);
-        if (!samplerResult.isSampled()) {
-            return invoker.invoke(invocation);
-        }
+//        //采样处理
+//        chain.reset();
+//        readers[0].setInterface(samplerInfoProvider.methodName(invoker, invocation));
+//        readers[1].setInterface(samplerInfoProvider.uniqueInterfaceKey(invoker, invocation));
+//        readers[2].setInterface(samplerInfoProvider.group());
+//        readers[3].setInterface(samplerInfoProvider.applicationName());
+//        readers[4].setInterface(DubboTraceConst.GLOBAL_SAMPLER_KEY);
+//
+//        chain.readForAll(samplerResult);
+//        if (!samplerResult.isSampled()) {
+//            return invoker.invoke(invocation);
+//        }
 
         //ignore this trace when sample is 0 or null
-        if (noneTraceBehaviors.ignore(invoker, invocation))
+        if (serverTraceIgnoredBehaviors.ignore(invoker, invocation))
             return invoker.invoke(invocation);
 
         //template method
