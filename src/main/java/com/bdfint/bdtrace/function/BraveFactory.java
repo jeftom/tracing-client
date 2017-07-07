@@ -64,7 +64,7 @@ public class BraveFactory {
         try {
             brave = new Brave.Builder(serviceName)
                     .spanCollector(
-                            HttpSpanCollector.create("http://" + Configuration.getZipkinHost() + ":9411"t, new EmptySpanCollectorMetricsHandler()))
+                            HttpSpanCollector.create("http://" + Configuration.getZipkinHost() + ":9411", new EmptySpanCollectorMetricsHandler()))
                     .traceSampler(SAMPLER).build();
         } catch (Exception e) {
             logger.info("异常信息：", e);

@@ -126,15 +126,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     protected void setParentServiceName(String serviceName, SpanId spanId) {
         cacheProcessor.setParentServiceName(serviceName, spanId);
-//        if (callTreeCache.get().size() == 0) {
-//            long andIncrement = threadName.getAndIncrement();
-//            logger.info(andIncrement);
-//            Thread.currentThread().setName(String.valueOf(andIncrement));
-//            logger.info("set in " + Thread.currentThread());
-//        } else {
-//            if (spanId.nullableParentId() != null)
-//                logger.info("WARNING-WARNING when set parent service name in provider");
-//        }
     }
 
     protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
@@ -145,7 +136,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             String parentSpanServiceName = localSpanId.getParentSpanServiceName();
             setInterceptors(parentSpanServiceName);
         }
-
     }
 
     protected void setInterceptors(String serviceName) {

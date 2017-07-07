@@ -7,6 +7,7 @@ import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.function.BraveFactory;
+import com.bdfint.bdtrace.function.ParentServiceNameMapCacheProcessor;
 import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ public class BraveProviderFilter implements Filter {
     protected ServerResponseInterceptor serverResponseInterceptor;
     protected String serviceName;
     protected String spanName;
+    protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -29,6 +31,10 @@ public class BraveProviderFilter implements Filter {
         setInterceptors(serviceName);
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
+        SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
+        if (spanId == null)// sample is 0 or null
+            return invoker.invoke(invocation);
+        setParentServiceName(serviceName, spanId);
         serverRequestInterceptor.handle(dubboServerRequestAdapter);
 
         Result result = null;
@@ -49,5 +55,9 @@ public class BraveProviderFilter implements Filter {
 
     public void afterHandle(Invocation invocation) {
         serverResponseInterceptor.handle(new DubboServerResponseAdapter(StatusEnum.OK, null, 0));
+    }
+
+    protected void setParentServiceName(String serviceName, SpanId spanId) {
+        cacheProcessor.setParentServiceName(serviceName, spanId);
     }
 }
