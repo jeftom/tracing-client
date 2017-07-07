@@ -56,13 +56,13 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
     public boolean preHandle(Invoker<?> invoker, Invocation invocation) {
         logger.debug(serviceName + " consumer execute");
 
-        DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), spanName);
+        DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), spanName, serviceName);
         // 获取到
-        SpanId spanId = newNullableSpanId(clientRequestAdapter);
-        if (spanId == null)
-            return true;
-        if (spanId.nullableParentId() != null)
-            getParentServiceNameAndSetBrave(serviceName, spanId);
+//        SpanId spanId = newNullableSpanId(clientRequestAdapter);
+//        if (spanId == null)
+//            return true;
+//        if (spanId.nullableParentId() != null)
+//            getParentServiceNameAndSetBrave(serviceName, spanId);
 
         //clientRequestInterceptor has changed to parent service name brave.clientRequestInterceptor
         clientRequestInterceptor.handle(clientRequestAdapter);

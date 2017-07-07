@@ -31,7 +31,7 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
      */
     @Override
     public String group() {
-        return RpcContext.getContext().getUrl().getParameter("group","0");
+        return RpcContext.getContext().getUrl().getParameter("group", "0");
     }
 
     /**
@@ -47,9 +47,9 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
     /**
      * 方法名
      *
-     * @return
      * @param invoker
      * @param invocation
+     * @return
      */
     @Override
     public String methodName(Invoker<?> invoker, Invocation invocation) {
@@ -60,7 +60,7 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
 
     @Override
     public String serviceName(Invoker<?> invoker, Invocation invocation) {
-        return applicationName() + "-" + invoker.getInterface().getSimpleName();
+        return invoker.getInterface().getSimpleName();
     }
 
     /**

@@ -5,10 +5,7 @@ import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.functionable.GlobalSampler;
 import com.bdfint.bdtrace.util.Configuration;
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ClientRequestInterceptor;
-import com.github.kristofa.brave.ClientResponseInterceptor;
-import com.github.kristofa.brave.Sampler;
+import com.github.kristofa.brave.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -92,7 +89,7 @@ public class BraveFactory {
         ClientRequestInterceptor clientRequestInterceptor = brave.clientRequestInterceptor();
         ClientResponseInterceptor clientResponseInterceptor = brave.clientResponseInterceptor();
         Map<String, String> headers = new HashMap<>();
-        clientRequestInterceptor.handle(new DubboClientRequestAdapter(headers, "api"));
+        clientRequestInterceptor.handle(new DubboClientRequestAdapter(headers, "api", "ser"));
         System.out.println("mock method calling...");
         clientResponseInterceptor.handle(new DubboClientResponseAdapter(StatusEnum.OK, null, System.currentTimeMillis()));
 

@@ -24,10 +24,12 @@ public class DubboClientRequestAdapter implements ClientRequestAdapter {
     private Map<String, String> headers;
     private String spanName;
     private SpanId spanId;
+    private String serviceName;
 
-    public DubboClientRequestAdapter(Map<String, String> headers, String spanName) {
+    public DubboClientRequestAdapter(Map<String, String> headers, String spanName, String serviceName) {
         this.headers = headers;
         this.spanName = spanName;
+        this.serviceName = serviceName;
     }
 
     public Map<String, String> getHeaders() {
@@ -53,7 +55,9 @@ public class DubboClientRequestAdapter implements ClientRequestAdapter {
     public Endpoint serverAddress() {
         InetSocketAddress inetSocketAddress = RpcContext.getContext().getRemoteAddress();
         String ipAddr = RpcContext.getContext().getUrl().getIp();
-        return Endpoint.create(spanName, IPConversionUtils.convertToInt(ipAddr), inetSocketAddress.getPort());
-
+        return Endpoint.builder()
+                .serviceName(serviceName)
+                .ipv4(IPConversionUtils.convertToInt(ipAddr))
+                .port(inetSocketAddress.getPort()).build();
     }
 }

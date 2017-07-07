@@ -1,14 +1,11 @@
 package com.bdfint.bdtrace.adapter;
 
-import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.StatusEnum;
-import com.bdfint.bdtrace.util.Configuration;
 import com.github.kristofa.brave.ClientResponseAdapter;
 import com.github.kristofa.brave.KeyValueAnnotation;
 import com.github.kristofa.brave.internal.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -29,17 +26,17 @@ public class DubboClientResponseAdapter implements ClientResponseAdapter {
 
     public Collection<KeyValueAnnotation> responseAnnotations() {
         Collection<KeyValueAnnotation> annotations = new ArrayList<KeyValueAnnotation>();
-        long cost = System.currentTimeMillis() - cs;
-        String elapse = String.valueOf(cost) + "ms";
-        annotations.add(KeyValueAnnotation.create(DubboTraceConst.WHOLE_ELAPSE, elapse));
-        if (Configuration.timeout() < cost) {
-            annotations.add(KeyValueAnnotation.create(DubboTraceConst.TIMEOUT, Boolean.TRUE.toString()));
-        }
-        annotations.add(KeyValueAnnotation.create(DubboTraceConst.CLIENT_RESPONSE_STATUS_CODE, status.getDesc()));
-        if (throwable != null) {
-            annotations.add(KeyValueAnnotation.create(DubboTraceConst.EXCEPTION_STACK_MESSAGE, Arrays.toString(throwable.getStackTrace())));
-            annotations.add(KeyValueAnnotation.create(DubboTraceConst.EXCEPTION_MESSAGE, throwable.getCause().toString()));
-        }
+//        long cost = System.currentTimeMillis() - cs;
+//        String elapse = String.valueOf(cost) + "ms";
+//        annotations.add(KeyValueAnnotation.create(DubboTraceConst.WHOLE_ELAPSE, elapse));
+//        if (Configuration.timeout() < cost) {
+//            annotations.add(KeyValueAnnotation.create(DubboTraceConst.TIMEOUT, Boolean.TRUE.toString()));
+//        }
+//        annotations.add(KeyValueAnnotation.create(DubboTraceConst.CLIENT_RESPONSE_STATUS_CODE, status.getDesc()));
+//        if (throwable != null) {
+//            annotations.add(KeyValueAnnotation.create(DubboTraceConst.EXCEPTION_STACK_MESSAGE, Arrays.toString(throwable.getStackTrace())));
+//            annotations.add(KeyValueAnnotation.create(DubboTraceConst.EXCEPTION_MESSAGE, throwable.getCause().toString()));
+//        }
         return annotations;
     }
 }

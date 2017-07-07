@@ -1,6 +1,5 @@
 package com.bdfint.bdtrace.adapter;
 
-import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.function.AttachmentTransmission;
 import com.bdfint.bdtrace.functionable.AttachmentTransmittable;
 import com.github.kristofa.brave.KeyValueAnnotation;
@@ -38,7 +37,9 @@ public class DubboServerRequestAdapter implements ServerRequestAdapter {
 
     public Collection<KeyValueAnnotation> requestAnnotations() {
 
-        String elapse = String.valueOf(System.currentTimeMillis() - cs[0]) + "ms";
-        return Collections.singleton(KeyValueAnnotation.create(DubboTraceConst.CLIENT_TO_SERVER_ELAPSE, elapse));
+//        String elapse = String.valueOf(System.currentTimeMillis() - cs[0]) + "ms";
+//        return Collections.singleton(KeyValueAnnotation.create(DubboTraceConst.CLIENT_TO_SERVER_ELAPSE, elapse));
+        return Collections.EMPTY_LIST;
     }
+
 }
