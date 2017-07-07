@@ -43,7 +43,7 @@
         <dependency>
             <groupId>io.zipkin.brave</groupId>
             <artifactId>brave-core</artifactId>
-            <version>4.3.0</version>
+            <version>3.9.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.zipkin.java</groupId>

@@ -2,51 +2,51 @@ package com.bdfint.bdtrace;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
-import com.bdfint.bdtrace.function.AbstractDubboFilter;
-import com.github.kristofa.brave.SpanId;
+import com.bdfint.bdtrace.bean.StatusEnum;
+import com.bdfint.bdtrace.function.BraveFactory;
+import com.github.kristofa.brave.Brave;
+import com.github.kristofa.brave.ServerRequestInterceptor;
+import com.github.kristofa.brave.ServerResponseInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Activate(group = {Constants.PROVIDER})
-public class BraveProviderFilter extends AbstractDubboFilter {
+public class BraveProviderFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BraveProviderFilter.class);
+    protected Brave brave = null;
+    protected ServerRequestInterceptor serverRequestInterceptor;
+    protected ServerResponseInterceptor serverResponseInterceptor;
+    protected String serviceName;
+    protected String spanName;
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        serviceName = invoker.getInterface().getCanonicalName();
+        spanName = invocation.getMethodName();
+        setInterceptors(serviceName);
+
+        DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
+        serverRequestInterceptor.handle(dubboServerRequestAdapter);
+
         Result result = null;
-        try {
-            result = super.invoke(invoker, invocation);
-        } catch (RpcException e) {
-            result = invoker.invoke(invocation);
-            logger.error("RPC Provider 端异常，忽略本次追踪。", e);
-        }
+        result = invoker.invoke(invocation);
+        afterHandle(invocation);//template method
         return result;
     }
 
-    @Override
-    public boolean preHandle(Invoker<?> invoker, Invocation invocation) {
-        logger.debug(serviceName + " provider execute");
+    protected void setInterceptors(String serviceName) {
+        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
+            return;
+        }
 
-        DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
-
-        annotated.serverReceived(serviceName, dubboServerRequestAdapter);
-        SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
-        if (spanId == null)// sample is 0 or null
-            return true;
-//        setParentServiceName(serviceName, spanId);
-        serverRequestInterceptor.handle(dubboServerRequestAdapter);
-
-        return false;
+        this.serverRequestInterceptor = brave.serverRequestInterceptor();
+        this.serverResponseInterceptor = brave.serverResponseInterceptor();
     }
 
-    @Override
     public void afterHandle(Invocation invocation) {
-        serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, exception, annotated.sr()));
+        serverResponseInterceptor.handle(new DubboServerResponseAdapter(StatusEnum.OK, null, 0));
     }
 }
