@@ -6,6 +6,7 @@ import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.functionable.GlobalSampler;
 import com.bdfint.bdtrace.util.Configuration;
 import com.github.kristofa.brave.*;
+import com.github.kristofa.brave.http.HttpSpanCollector;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -61,17 +62,10 @@ public class BraveFactory {
 
         Brave brave = null;
         try {
-            if (CACHE.containsKey(serviceName)) {
-                brave = CACHE.get(serviceName);
-            } else {
-                brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(sampler).build();
-                if (brave != null) {
-                    CACHE.put(serviceName, brave);
-                    // TODO CACHE.size() == MAX_SIZE ? CACHE.
-                } else {
-                    logger.error("brave 初始化失败，serviceName:{}", serviceName);
-                }
-            }
+            brave = new Brave.Builder(serviceName)
+                    .spanCollector(
+                            HttpSpanCollector.create("http://" + Configuration.getZipkinHost() + ":9411"t, new EmptySpanCollectorMetricsHandler()))
+                    .traceSampler(SAMPLER).build();
         } catch (Exception e) {
             logger.info("异常信息：", e);
         } finally {

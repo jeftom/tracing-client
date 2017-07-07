@@ -64,7 +64,7 @@ public class ClientRequestInterceptorProxy {
         if (serverAddress == null) {
             clientTracer.setClientSent();
         } else {
-            clientTracer.setClientSent(serverAddress);
+            clientTracer.setClientSent(serverAddress.ipv4,serverAddress.port,serverAddress.service_name);
         }
     }
 }

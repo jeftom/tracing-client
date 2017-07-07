@@ -33,6 +33,13 @@ public class Configuration {
         return zipkinUrl();
     }
 
+
+    public static String getZipkinHost() {
+        zipkinHost = getProperty(HOST);
+        return zipkinHost;
+    }
+
+
     /**
      * get property from file named zipkin.properties under <b>resources</b>
      *

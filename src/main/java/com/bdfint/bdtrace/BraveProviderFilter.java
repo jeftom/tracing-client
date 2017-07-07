@@ -7,9 +7,7 @@ import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.function.BraveFactory;
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerRequestInterceptor;
-import com.github.kristofa.brave.ServerResponseInterceptor;
+import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +15,8 @@ import org.slf4j.LoggerFactory;
 public class BraveProviderFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BraveProviderFilter.class);
     protected Brave brave = null;
+    protected ClientRequestInterceptor clientRequestInterceptor;
+    protected ClientResponseInterceptor clientResponseInterceptor;
     protected ServerRequestInterceptor serverRequestInterceptor;
     protected ServerResponseInterceptor serverResponseInterceptor;
     protected String serviceName;
@@ -41,7 +41,8 @@ public class BraveProviderFilter implements Filter {
         if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
             return;
         }
-
+        this.clientRequestInterceptor = brave.clientRequestInterceptor();
+        this.clientResponseInterceptor = brave.clientResponseInterceptor();
         this.serverRequestInterceptor = brave.serverRequestInterceptor();
         this.serverResponseInterceptor = brave.serverResponseInterceptor();
     }
