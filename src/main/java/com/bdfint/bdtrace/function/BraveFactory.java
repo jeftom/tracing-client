@@ -5,7 +5,10 @@ import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.functionable.GlobalSampler;
 import com.bdfint.bdtrace.util.Configuration;
-import com.github.kristofa.brave.*;
+import com.github.kristofa.brave.Brave;
+import com.github.kristofa.brave.ClientRequestInterceptor;
+import com.github.kristofa.brave.ClientResponseInterceptor;
+import com.github.kristofa.brave.Sampler;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -61,16 +64,12 @@ public class BraveFactory {
 
         Brave brave = null;
         try {
-            if (CACHE.containsKey(serviceName)) {
-                brave = CACHE.get(serviceName);
+            brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(sampler).build();
+            if (brave != null) {
+                CACHE.put(serviceName, brave);
+                // TODO CACHE.size() == MAX_SIZE ? CACHE.
             } else {
-                brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(sampler).build();
-                if (brave != null) {
-                    CACHE.put(serviceName, brave);
-                    // TODO CACHE.size() == MAX_SIZE ? CACHE.
-                } else {
-                    logger.error("brave 初始化失败，serviceName:{}", serviceName);
-                }
+                logger.error("brave 初始化失败，serviceName:{}", serviceName);
             }
         } catch (Exception e) {
             logger.info("异常信息：", e);
