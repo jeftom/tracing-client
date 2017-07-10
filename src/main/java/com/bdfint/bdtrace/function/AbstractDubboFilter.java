@@ -1,7 +1,6 @@
 package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
-import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.bean.StatusEnum;
@@ -14,11 +13,6 @@ import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * @author heyb
  * @date 2017/5/18.
@@ -26,29 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
-    private static AtomicLong threadName = new AtomicLong(0);
-    // brave and interceptors
-    protected Brave brave = null;
-    protected ClientRequestInterceptor clientRequestInterceptor;
-    protected ClientResponseInterceptor clientResponseInterceptor;
-    protected ServerRequestInterceptor serverRequestInterceptor;
-    protected ServerResponseInterceptor serverResponseInterceptor;
-
-    // interface dependencies and impl.
-    protected AnnotatedImpl annotated = new AnnotatedImpl();
-    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
-    protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
-    protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
-
-//    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
     protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
-
-    //field
-    protected StatusEnum status = StatusEnum.OK;
-    protected String serviceName;
-    protected String spanName;
-    protected Throwable exception;
-
     //for sampler
     static AbstractSamplerConfigReader[] readers = {
             new MethodSamplerConfigReader(),
@@ -57,8 +29,24 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             new ApplicationSamplerConfigReader(),
             new GlobalSamplerConfigReader()
     };
-    SamplerResult samplerResult = new SamplerResult();
     static ReaderChain chain = new SamplerConfigReaderChain();
+    // brave and interceptors
+    protected volatile Brave brave = null;
+    protected volatile ClientRequestInterceptor clientRequestInterceptor;
+    protected volatile ClientResponseInterceptor clientResponseInterceptor;
+    protected volatile ServerRequestInterceptor serverRequestInterceptor;
+    protected volatile ServerResponseInterceptor serverResponseInterceptor;
+    // interface dependencies and impl.
+    protected volatile AnnotatedImpl annotated = new AnnotatedImpl();
+    protected volatile ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
+    protected volatile ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
+    protected volatile ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
+    //field
+    protected volatile StatusEnum status = StatusEnum.OK;
+    protected volatile String serviceName;
+    protected volatile String spanName;
+    protected volatile Throwable exception;
+    SamplerResult samplerResult = new SamplerResult();
 
     public AbstractDubboFilter() {
         chain.addReaders(readers);
@@ -82,7 +70,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
      */
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
-        logger.debug("当前的dubbo filter hashcode={}",this);
+        logger.debug("当前的dubbo filter hashcode={}", this);
 //
 //        //采样处理
 //        chain.reset();
@@ -116,7 +104,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             exception = handleAndGetException(result, serviceName); //template method
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
-//            exception = new Throwable("dubbo RPC调用异常", e);
             exception = e;
         } finally {
             afterHandle(invocation);//template method
@@ -126,15 +113,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     protected void setParentServiceName(String serviceName, SpanId spanId) {
         cacheProcessor.setParentServiceName(serviceName, spanId);
-//        if (callTreeCache.get().size() == 0) {
-//            long andIncrement = threadName.getAndIncrement();
-//            logger.info(andIncrement);
-//            Thread.currentThread().setName(String.valueOf(andIncrement));
-//            logger.info("set in " + Thread.currentThread());
-//        } else {
-//            if (spanId.nullableParentId() != null)
-//                logger.info("WARNING-WARNING when set parent service name in provider");
-//        }
     }
 
     protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
@@ -168,44 +146,14 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     public Throwable handleAndGetException(Result result, String serviceName) {
         if (result.hasException()) {
             status = StatusEnum.ERROR;
-            logger.error("======================TRACING CLIENT Exception=====================");
+            logger.error("======================远程方法系统异常=====================");
             logger.error("serviceName: {}, class: {}", serviceName, this);
             logger.error("Exception info {}", result.getException());
-            logger.error("远程方法系统异常");
-            logger.error("======================TRACING CLIENT Exception=====================");
+            logger.error("======================远程方法系统异常=====================");
             logger.error("");
-//            return new Throwable("远程方法系统异常", result.getException());
-//                result.getException().printStackTrace();
             return result.getException();
         }
         return null;
     }
 
-    private void setSampled(DubboClientRequestAdapter clientRequestAdapter, boolean sampled) {
-        try {
-            Field field = ClientRequestInterceptor.class.getDeclaredField("clientTracer");
-            field.setAccessible(true);
-            ClientTracer clientTracer = (ClientTracer) field.get(clientRequestInterceptor);
-            try {
-                Method serverSpan = ClientTracer.class.getDeclaredMethod("currentServerSpan", ServerSpanThreadBinder.class);
-                serverSpan.setAccessible(true);
-                ServerSpanThreadBinder invoke = ((ServerSpanThreadBinder) serverSpan.invoke(clientTracer));
-                ServerSpan currentServerSpan = invoke.getCurrentServerSpan();
-                Method spanId = ServerSpan.class.getDeclaredMethod("spanId");
-                spanId.setAccessible(true);
-                SpanId Id = ((SpanId) spanId.invoke(currentServerSpan));
-
-
-
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchFieldException e) {
-            logger.info("异常信息：", e);
-        } catch (IllegalAccessException e) {
-            logger.info("异常信息：", e);
-        }
-    }
 }

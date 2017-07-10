@@ -58,11 +58,14 @@ public abstract class AbstractSamplerConfigReader implements ConfigReader, Curre
 //    protected abstract boolean readForThis(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain);
 
     protected boolean readForThis(Map<String, Sampler> config, SamplerResult samplerResult, ReaderChain chain) {
+        if (config == null)
+            throw new NullPointerException("采样率的配置为空");
+        if (!config.containsKey(getInterface()))
+            throw new IllegalStateException("未正确设置当前的上下文接口。");
+
         boolean sampled = config.get(getInterface()).isSampled(0);
         samplerResult.setSampled(sampled);
         logger.debug("当前采样接口名称：{}, 采样：{}", getInterface(), sampled);
         return true;
-//        logger.debug("当前服务接口名称：{}, 采样：{}", getInterface(), true);
-//        return false;
     }
 }

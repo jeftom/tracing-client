@@ -69,7 +69,6 @@ public class SamplerConfigReaderChainTest {
             }
             idx++;
         }
-//        Assert.assertArrayEquals(counts, actual);
         Assert.assertArrayEquals(counts, global);
     }
 

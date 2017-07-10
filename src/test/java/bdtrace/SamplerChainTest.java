@@ -1,5 +1,6 @@
 package bdtrace;
 
+import com.bdfint.bdtrace.bean.DubboTraceConst;
 import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
@@ -78,7 +79,7 @@ public class SamplerChainTest {
             readers[1].setInterface(service);
             readers[2].setInterface(group);
             readers[3].setInterface(application);
-            readers[4].setInterface("");
+            readers[4].setInterface(DubboTraceConst.GLOBAL_SAMPLER_KEY);
 
             chain.readForAll(samplerResult);
             if (samplerResult.isSampled)

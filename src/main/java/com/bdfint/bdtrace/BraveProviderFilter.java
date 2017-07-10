@@ -39,7 +39,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
         if (spanId == null)// sample is 0 or null
             return true;
-//        setParentServiceName(serviceName, spanId);
+        setParentServiceName(serviceName, spanId);
         serverRequestInterceptor.handle(dubboServerRequestAdapter);
 
         return false;

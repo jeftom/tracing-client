@@ -1,0 +1,41 @@
+2017/07/05-16:03:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 1,serviceName is 1
+2017/07/05-16:03:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 2,serviceName is 2
+2017/07/05-16:03:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 2,serviceName is 2
+2017/07/05-16:03:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 3,serviceName is 3
+2017/07/05-16:03:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 4,serviceName is 4
+2017/07/05-16:03:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 5,serviceName is 5
+2017/07/05-16:04:11 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存29999ms
+2017/07/05-16:04:11 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存29993ms
+2017/07/05-16:04:11 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存29993ms
+2017/07/05-16:04:11 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存29993ms
+2017/07/05-16:04:11 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存29993ms
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存59999ms
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 1 has been clear
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存59992ms
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 2 has been clear
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存59993ms
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 3 has been clear
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存59993ms
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 4 has been clear
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存59993ms
+2017/07/05-16:04:41 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 5 has been clear
+2017/07/05-16:07:07 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 3,serviceName is 3
+2017/07/05-16:07:07 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 5,serviceName is 5
+2017/07/05-16:07:07 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 2,serviceName is 2
+2017/07/05-16:07:07 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 4,serviceName is 4
+2017/07/05-16:07:07 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 缓存设置成功，spanId is 1,serviceName is 1
+2017/07/05-16:07:10 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存2934ms
+2017/07/05-16:07:10 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存2935ms
+2017/07/05-16:07:10 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存2935ms
+2017/07/05-16:07:10 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存2935ms
+2017/07/05-16:07:10 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存2935ms
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存5934ms
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 1 has been clear
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存5934ms
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 2 has been clear
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存5934ms
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 3 has been clear
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存5934ms
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 4 has been clear
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - 已生存5934ms
+2017/07/05-16:07:13 DEBUG [c.b.b.f.ParentServiceNameMapCacheProcessor] - cache 5 has been clear
