@@ -37,7 +37,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
     @Override
     public void setParentServiceName(String serviceName, SpanId spanId) {
         CACHE.put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()));
-        logger.debug("缓存设置成功，spanId is {},serviceName is {}", spanId.spanId, serviceName);
+        logger.debug("缓存设置成功，spanId is {},serviceName is {},缓存容量 {}", spanId.spanId, serviceName, CACHE.size());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
             logger.debug("缓存@{} 已生存 {} ms", value.getParentSpanId(), elapse);
             if (elapse >= sInternal) {
                 spanIdMap.remove(entry.getKey());
-                logger.debug("缓存 {} has been clear",value.getParentSpanId());
+                logger.debug("缓存 {} has been clear,缓存容量 {}", value.getParentSpanId(), CACHE.size());
                 hasEntryRemoved = true;
             }
         }
