@@ -1,5 +1,6 @@
 package com.bdfint.bdtrace.function;
 
+import com.alibaba.dubbo.common.utils.NamedThreadFactory;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
 import com.github.kristofa.brave.SpanId;
@@ -18,20 +19,53 @@ import java.util.concurrent.TimeUnit;
  * @desriptioin
  */
 public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCacheProcessing {
-    private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
-    private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
     /**
      * CACHE for parent service
      */
-    protected static volatile Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
-    private static int sInternal = 3 * 1000; // unit is ms
+    protected static final Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
+    private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("serviceName缓存清理"));
+    private static int sInternal = 2 * 60 * 1000; // unit is ms
+
+    static {
+        clearTask();
+    }
 
     public ParentServiceNameMapCacheProcessor() {
-        clearTask();
+//        clearTask();
     }
 
     public static Map<Long, LocalSpanId> getCache() {
         return CACHE;
+    }
+
+    public static boolean clearCache() {
+        boolean hasEntryRemoved = false;
+        Map<Long, LocalSpanId> spanIdMap = CACHE;
+        for (Map.Entry<Long, LocalSpanId> entry : spanIdMap.entrySet()) {
+            LocalSpanId value = entry.getValue();
+            long elapse = System.currentTimeMillis() - value.getTime();
+            logger.debug("缓存@{} 已生存 {} ms", value.getParentSpanId(), elapse);
+            if (elapse >= sInternal) {
+                spanIdMap.remove(entry.getKey());
+                logger.debug("缓存 {} has been clear", value.getParentSpanId());
+                hasEntryRemoved = true;
+            }
+        }
+
+        return hasEntryRemoved;
+    }
+
+    /**
+     * 定时清理,一旦new一个当前对象则有一个单线程的线程池被修改，重新执行任务
+     */
+    public static void clearTask() {
+        SERVICE.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                clearCache();
+            }
+        }, sInternal, sInternal, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -50,7 +84,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         }
 
         if (System.currentTimeMillis() - localSpanId.getTime() > sInternal) {
-            logger.warn("设置的缓存清理时间过小，请重新设置");
+            logger.warn("设置的缓存清理时间过小，已重新设置");
             sInternal += 1000;
         }
 
@@ -61,35 +95,5 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         logger.debug("获取缓存 {}", spanId.parentId);
         return localSpanId;
 
-    }
-
-    public boolean clearCache() {
-        boolean hasEntryRemoved = false;
-        Map<Long, LocalSpanId> spanIdMap = CACHE;
-        for (Map.Entry<Long, LocalSpanId> entry : spanIdMap.entrySet()) {
-            LocalSpanId value = entry.getValue();
-            long elapse = System.currentTimeMillis() - value.getTime();
-            logger.debug("缓存@{} 已生存 {} ms", value.getParentSpanId(), elapse);
-            if (elapse >= sInternal) {
-                spanIdMap.remove(entry.getKey());
-                logger.debug("缓存 {} has been clear",value.getParentSpanId());
-                hasEntryRemoved = true;
-            }
-        }
-
-        return hasEntryRemoved;
-    }
-
-
-    /**
-     * 定时清理,一旦new一个当前对象则有一个单线程的线程池被修改，重新执行任务
-     */
-    public void clearTask() {
-        SERVICE.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                clearCache();
-            }
-        }, sInternal, sInternal, TimeUnit.MILLISECONDS);
     }
 }
