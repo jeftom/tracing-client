@@ -3,6 +3,7 @@ package com.bdfint.bdtrace.function;
 import com.alibaba.dubbo.common.utils.NamedThreadFactory;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
+import com.bdfint.bdtrace.util.Configuration;
 import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
     protected static final Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("serviceName缓存清理"));
-    private static int sInternal = 2 * 60 * 1000; // unit is ms
+    private static int sInternal = Integer.valueOf(Configuration.getProperty("service.name.cache.internal")) * 60 * 1000; // unit is ms
 
     static {
         clearTask();
