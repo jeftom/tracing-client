@@ -14,21 +14,28 @@ import org.slf4j.LoggerFactory;
 
 @Activate(group = {Constants.PROVIDER})
 public class BraveProviderFilter implements Filter {
+    protected static final ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
     private static final Logger logger = LoggerFactory.getLogger(BraveProviderFilter.class);
     protected Brave brave = null;
-    protected ClientRequestInterceptor clientRequestInterceptor;
-    protected ClientResponseInterceptor clientResponseInterceptor;
-    protected ServerRequestInterceptor serverRequestInterceptor;
-    protected ServerResponseInterceptor serverResponseInterceptor;
-    protected String serviceName;
     protected String spanName;
-    protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        ClientRequestInterceptor clientRequestInterceptor;
+        ClientResponseInterceptor clientResponseInterceptor;
+        ServerRequestInterceptor serverRequestInterceptor;
+        ServerResponseInterceptor serverResponseInterceptor;
+        String serviceName;
+        Brave brave = null;
         serviceName = invoker.getInterface().getCanonicalName();
         spanName = invocation.getMethodName();
-        setInterceptors(serviceName);
+        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
+            return invoker.invoke(invocation);
+        }
+        clientRequestInterceptor = brave.clientRequestInterceptor();
+        clientResponseInterceptor = brave.clientResponseInterceptor();
+        serverRequestInterceptor = brave.serverRequestInterceptor();
+        serverResponseInterceptor = brave.serverResponseInterceptor();
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
         SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
@@ -39,22 +46,22 @@ public class BraveProviderFilter implements Filter {
 
         Result result = null;
         result = invoker.invoke(invocation);
-        afterHandle(invocation);//template method
+        serverResponseInterceptor.handle(new DubboServerResponseAdapter(StatusEnum.OK, null, 0));
         return result;
     }
 
     protected void setInterceptors(String serviceName) {
-        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
-            return;
-        }
-        this.clientRequestInterceptor = brave.clientRequestInterceptor();
-        this.clientResponseInterceptor = brave.clientResponseInterceptor();
-        this.serverRequestInterceptor = brave.serverRequestInterceptor();
-        this.serverResponseInterceptor = brave.serverResponseInterceptor();
+//        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
+//            return;
+//        }
+//        this.clientRequestInterceptor = brave.clientRequestInterceptor();
+//        this.clientResponseInterceptor = brave.clientResponseInterceptor();
+//        this.serverRequestInterceptor = brave.serverRequestInterceptor();
+//        this.serverResponseInterceptor = brave.serverResponseInterceptor();
     }
 
     public void afterHandle(Invocation invocation) {
-        serverResponseInterceptor.handle(new DubboServerResponseAdapter(StatusEnum.OK, null, 0));
+//        serverResponseInterceptor.handle(new DubboServerResponseAdapter(StatusEnum.OK, null, 0));
     }
 
     protected void setParentServiceName(String serviceName, SpanId spanId) {

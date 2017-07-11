@@ -18,37 +18,56 @@ import java.lang.reflect.Field;
 @Activate(group = {Constants.CONSUMER})
 public class BraveConsumerFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
-    protected Brave brave = null;
-    protected ClientRequestInterceptor clientRequestInterceptor;
-    protected ClientResponseInterceptor clientResponseInterceptor;
-    protected ServerRequestInterceptor serverRequestInterceptor;
-    protected ServerResponseInterceptor serverResponseInterceptor;
     protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
-
-    protected String serviceName;
+    protected Brave brave = null;
     protected String spanName;
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        String serviceName;
         serviceName = invoker.getInterface().getCanonicalName();
         spanName = invocation.getMethodName();
-        setInterceptors(serviceName);
+
+        ClientRequestInterceptor clientRequestInterceptor;
+        ClientResponseInterceptor clientResponseInterceptor;
+        ServerRequestInterceptor serverRequestInterceptor;
+        ServerResponseInterceptor serverResponseInterceptor;
+        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
+            return invoker.invoke(invocation);
+        }
+        clientRequestInterceptor = brave.clientRequestInterceptor();
+        clientResponseInterceptor = brave.clientResponseInterceptor();
+        serverRequestInterceptor = brave.serverRequestInterceptor();
+        serverResponseInterceptor = brave.serverResponseInterceptor();
 
         DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), spanName, serviceName);
 
-        SpanId spanId = newNullableSpanId(clientRequestAdapter);
+        SpanId spanId = newNullableSpanId(clientRequestAdapter, clientRequestInterceptor);
         if (spanId == null)
             return invoker.invoke(invocation);
-        if (spanId.nullableParentId() != null)
-            getParentServiceNameAndSetBrave(serviceName, spanId);
+        if (spanId.nullableParentId() != null) {
+            LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
+
+            //if there is no CACHE
+            if (localSpanId != null) {
+                String parentSpanServiceName = localSpanId.getParentSpanServiceName();
+                brave = BraveFactory.nullableInstance(parentSpanServiceName);
+                clientRequestInterceptor = brave.clientRequestInterceptor();
+                clientResponseInterceptor = brave.clientResponseInterceptor();
+                serverRequestInterceptor = brave.serverRequestInterceptor();
+                serverResponseInterceptor = brave.serverResponseInterceptor();
+            }
+        }
 
         clientRequestInterceptor.handle(clientRequestAdapter);
 
         Result result = null;
         result = invoker.invoke(invocation);
-        afterHandle(invocation);//template method
+        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(StatusEnum.OK, null, 0);
+        clientResponseInterceptor.handle(clientResponseAdapter);
         return result;
     }
+
     protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
         LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
 
@@ -58,19 +77,20 @@ public class BraveConsumerFilter implements Filter {
             setInterceptors(parentSpanServiceName);
         }
     }
+
     protected void setInterceptors(String serviceName) {
-        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
-            return;
-        }
-        this.clientRequestInterceptor = brave.clientRequestInterceptor();
-        this.clientResponseInterceptor = brave.clientResponseInterceptor();
-        this.serverRequestInterceptor = brave.serverRequestInterceptor();
-        this.serverResponseInterceptor = brave.serverResponseInterceptor();
+//        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
+//            return;
+//        }
+//        this.clientRequestInterceptor = brave.clientRequestInterceptor();
+//        this.clientResponseInterceptor = brave.clientResponseInterceptor();
+//        this.serverRequestInterceptor = brave.serverRequestInterceptor();
+//        this.serverResponseInterceptor = brave.serverResponseInterceptor();
     }
 
     public void afterHandle(Invocation invocation) {
-        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(StatusEnum.OK, null, 0);
-        clientResponseInterceptor.handle(clientResponseAdapter);
+//        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(StatusEnum.OK, null, 0);
+//        clientResponseInterceptor.handle(clientResponseAdapter);
     }
 
     /**
@@ -79,7 +99,7 @@ public class BraveConsumerFilter implements Filter {
      * @param clientRequestAdapter
      * @return
      */
-    private SpanId newNullableSpanId(DubboClientRequestAdapter clientRequestAdapter) {
+    private SpanId newNullableSpanId(DubboClientRequestAdapter clientRequestAdapter, ClientRequestInterceptor clientRequestInterceptor) {
         SpanId spanId;
         try {
             Field field = ClientRequestInterceptor.class.getDeclaredField("clientTracer");

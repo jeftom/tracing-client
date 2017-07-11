@@ -24,7 +24,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
      * CACHE for parent service
      */
     protected static volatile Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
-    private static int sInternal = 3 * 1000; // unit is ms
+    private static int sInternal = 3 * 60 * 1000; // unit is ms
 
     public ParentServiceNameMapCacheProcessor() {
         clearTask();
