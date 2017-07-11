@@ -1,6 +1,7 @@
 package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
+import com.bdfint.bdtrace.bean.BravePack;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.chain.ReaderChain;
@@ -21,47 +22,35 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected final static ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
     //for sampler
-    final static AbstractSamplerConfigReader[] readers = {
+    private final static AbstractSamplerConfigReader[] readers = {
             new MethodSamplerConfigReader(),
             new ServiceSamplerConfigReader(),
             new GroupSamplerConfigReader(),
             new ApplicationSamplerConfigReader(),
             new GlobalSamplerConfigReader()
     };
-    final static ReaderChain chain = new SamplerConfigReaderChain();
+    private final static ReaderChain chain = new SamplerConfigReaderChain();
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
 
     static {
         chain.addReaders(readers);
     }
 
-    // brave and interceptors
-//    protected ClientRequestInterceptor clientRequestInterceptor;
-//    protected ClientResponseInterceptor clientResponseInterceptor;
-//    protected ServerRequestInterceptor serverRequestInterceptor;
-//    protected ServerResponseInterceptor serverResponseInterceptor;
-    // interface dependencies and impl.
-
     //不依赖于初始化参数，是无状态的类
     protected AnnotatedImpl annotated = new AnnotatedImpl();
-    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
-    //field
-//    protected StatusEnum status = StatusEnum.OK;
-//    protected String spanName;
-//    protected Throwable exception;
-//    SamplerResult samplerResult = new SamplerResult();
+    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
     protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
 
     @Override
     public void initField(Invoker<?> invoker, Invocation invocation) {
 //        String serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
 //        String spanName = serviceInfoProvidable.spanName(invoker, invocation);
-//        setInterceptors(serviceName);
+//        brave(serviceName);
     }
 
     /**
-     * 事实证明 在同一application下的dubbo环境中，filter是<b>单例</b>的，至少在只有一对一的情况下是这样子的。。
+     * 事实证明 在同一application下的dubbo环境中，filter是<b>单例</b>的
      *
      * @param invoker
      * @param invocation
@@ -89,22 +78,21 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 //        if (noneTraceBehaviors.ignore(invoker, invocation))
 //            return invoker.invoke(invocation);
 
-        //template method
-//        initField(invoker, invocation);
-        Brave brave = null;
+        BravePack bravePack = new BravePack();
         Result result = null;
         Throwable exception = null;
         StatusEnum status = StatusEnum.OK;
         String serviceName;
         String spanName;
 
+        //template method
+        //initField(invoker, invocation);
         serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
         spanName = serviceInfoProvidable.spanName(invoker, invocation);
-        brave = setInterceptors(serviceName);
-
+        brave(serviceName, bravePack);
 
         //template method
-        if (brave == null || preHandle(invoker, invocation, serviceName, spanName, brave)) {
+        if (bravePack.brave == null || preHandle(invoker, invocation, serviceName, spanName, bravePack)) {
             return invoker.invoke(invocation);
         }
 
@@ -116,7 +104,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             status = StatusEnum.ERROR;
             exception = e;
         } finally {
-            afterHandle(invocation, status, exception, brave);//template method
+            afterHandle(invocation, status, exception, bravePack.brave);//template method
             return result;
         }
     }
@@ -125,23 +113,22 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         cacheProcessor.setParentServiceName(serviceName, spanId);
     }
 
-    protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
+    protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId, BravePack bravePack) {
         LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
 
         //if there is no CACHE
         if (localSpanId != null) {
             String parentSpanServiceName = localSpanId.getParentSpanServiceName();
-            setInterceptors(parentSpanServiceName);
+            brave(parentSpanServiceName, bravePack);
         }
 
     }
 
-    protected Brave setInterceptors(String serviceName) {
-        Brave brave = null;
-        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
-            return brave;
+    protected Brave brave(String serviceName, BravePack bravePack) {
+        if ((bravePack.brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
+//
         }
-        return brave;
+        return bravePack.brave;
     }
 
     /**

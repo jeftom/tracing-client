@@ -3,6 +3,7 @@ package com.bdfint.bdtrace.functionable;
 import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
+import com.bdfint.bdtrace.bean.BravePack;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.github.kristofa.brave.Brave;
 
@@ -25,10 +26,10 @@ public interface FilterTemplate {
      * @param invocation
      * @param serviceName
      * @param spanName
-     * @param brave
+     * @param bravePack
      * @return whether to return #Result
      */
-    boolean preHandle(Invoker<?> invoker, Invocation invocation, String serviceName, String spanName, Brave brave);
+    boolean preHandle(Invoker<?> invoker, Invocation invocation, String serviceName, String spanName, BravePack bravePack);
 
 //    void invoke();
 

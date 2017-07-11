@@ -8,6 +8,7 @@ import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcException;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
+import com.bdfint.bdtrace.bean.BravePack;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.function.AbstractDubboFilter;
 import com.github.kristofa.brave.Brave;
@@ -31,7 +32,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
     }
 
     @Override
-    public boolean preHandle(Invoker<?> invoker, Invocation invocation, String serviceName, String spanName, Brave brave) {
+    public boolean preHandle(Invoker<?> invoker, Invocation invocation, String serviceName, String spanName, BravePack bravePack) {
         logger.debug(serviceName + " provider execute");
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
@@ -41,7 +42,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
 //        if (spanId == null)// sample is 0 or null
 //            return true;
 //        setParentServiceName(serviceName, spanId);
-        brave.serverRequestInterceptor().handle(dubboServerRequestAdapter);
+        bravePack.serverRequestInterceptor().handle(dubboServerRequestAdapter);
 
         return false;
     }
