@@ -30,15 +30,11 @@ public class BraveConsumerFilter implements Filter {
 
         ClientRequestInterceptor clientRequestInterceptor;
         ClientResponseInterceptor clientResponseInterceptor;
-        ServerRequestInterceptor serverRequestInterceptor;
-        ServerResponseInterceptor serverResponseInterceptor;
         if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
             return invoker.invoke(invocation);
         }
         clientRequestInterceptor = brave.clientRequestInterceptor();
         clientResponseInterceptor = brave.clientResponseInterceptor();
-        serverRequestInterceptor = brave.serverRequestInterceptor();
-        serverResponseInterceptor = brave.serverResponseInterceptor();
 
         DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), spanName, serviceName);
 
@@ -54,8 +50,6 @@ public class BraveConsumerFilter implements Filter {
                 brave = BraveFactory.nullableInstance(parentSpanServiceName);
                 clientRequestInterceptor = brave.clientRequestInterceptor();
                 clientResponseInterceptor = brave.clientResponseInterceptor();
-                serverRequestInterceptor = brave.serverRequestInterceptor();
-                serverResponseInterceptor = brave.serverResponseInterceptor();
             }
         }
 
@@ -66,31 +60,6 @@ public class BraveConsumerFilter implements Filter {
         final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(StatusEnum.OK, null, 0);
         clientResponseInterceptor.handle(clientResponseAdapter);
         return result;
-    }
-
-    protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
-        LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
-
-        //if there is no CACHE
-        if (localSpanId != null) {
-            String parentSpanServiceName = localSpanId.getParentSpanServiceName();
-            setInterceptors(parentSpanServiceName);
-        }
-    }
-
-    protected void setInterceptors(String serviceName) {
-//        if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
-//            return;
-//        }
-//        this.clientRequestInterceptor = brave.clientRequestInterceptor();
-//        this.clientResponseInterceptor = brave.clientResponseInterceptor();
-//        this.serverRequestInterceptor = brave.serverRequestInterceptor();
-//        this.serverResponseInterceptor = brave.serverResponseInterceptor();
-    }
-
-    public void afterHandle(Invocation invocation) {
-//        final DubboClientResponseAdapter clientResponseAdapter = new DubboClientResponseAdapter(StatusEnum.OK, null, 0);
-//        clientResponseInterceptor.handle(clientResponseAdapter);
     }
 
     /**
