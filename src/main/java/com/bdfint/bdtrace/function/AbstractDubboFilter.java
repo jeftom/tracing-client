@@ -55,10 +55,9 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     @Override
     public void initField(Invoker<?> invoker, Invocation invocation) {
-        String serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
-        String spanName = serviceInfoProvidable.spanName(invoker, invocation);
-        setInterceptors(serviceName);
-//        Test.testServiceName(serviceName);
+//        String serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
+//        String spanName = serviceInfoProvidable.spanName(invoker, invocation);
+//        setInterceptors(serviceName);
     }
 
     /**
@@ -93,20 +92,23 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         //template method
 //        initField(invoker, invocation);
         Brave brave = null;
-        String serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
-        String spanName = serviceInfoProvidable.spanName(invoker, invocation);
+        Result result = null;
+        Throwable exception = null;
+        StatusEnum status = StatusEnum.OK;
+        String serviceName;
+        String spanName;
+
+        serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
+        spanName = serviceInfoProvidable.spanName(invoker, invocation);
         brave = setInterceptors(serviceName);
 
 
         //template method
-        if (preHandle(invoker, invocation, serviceName, spanName, brave)) {
+        if (brave == null || preHandle(invoker, invocation, serviceName, spanName, brave)) {
             return invoker.invoke(invocation);
         }
 
         //invoke
-        Result result = null;
-        Throwable exception = null;
-        StatusEnum status = StatusEnum.OK;
         try {
             result = invoker.invoke(invocation);
             exception = handleAndGetException(result, serviceName, status); //template method
@@ -152,10 +154,10 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     public Throwable handleAndGetException(Result result, String serviceName, StatusEnum status) {
         if (result.hasException()) {
             status = StatusEnum.ERROR;
-            logger.error("======================远程方法系统异常=====================");
+            logger.error("======================dubbo远程方法异常=====================");
             logger.error("serviceName: {}, class: {}", serviceName, this);
             logger.error("Exception info {}", result.getException());
-            logger.error("======================远程方法系统异常=====================");
+            logger.error("======================dubbo远程方法异常=====================");
             logger.error("");
             return result.getException();
         }

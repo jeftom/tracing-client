@@ -60,7 +60,7 @@ public class ServiceInfoProvider implements ServiceInfoProvidable {
 
     @Override
     public String serviceName(Invoker<?> invoker, Invocation invocation) {
-        return invoker.getInterface().getSimpleName();
+        return invoker.getInterface().getCanonicalName();
     }
 
     /**
