@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 public class BraveProviderFilter implements Filter {
     protected static final ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
     private static final Logger logger = LoggerFactory.getLogger(BraveProviderFilter.class);
-    protected Brave brave = null;
-    protected String spanName;
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -25,8 +23,9 @@ public class BraveProviderFilter implements Filter {
         ClientResponseInterceptor clientResponseInterceptor;
         ServerRequestInterceptor serverRequestInterceptor;
         ServerResponseInterceptor serverResponseInterceptor;
-        String serviceName;
         Brave brave = null;
+        String spanName;
+        String serviceName;
         serviceName = invoker.getInterface().getCanonicalName();
         spanName = invocation.getMethodName();
         if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空

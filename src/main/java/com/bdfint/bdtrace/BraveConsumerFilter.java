@@ -19,13 +19,13 @@ import java.lang.reflect.Field;
 public class BraveConsumerFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
     protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
-    protected Brave brave = null;
-    protected String spanName;
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         String serviceName;
         serviceName = invoker.getInterface().getCanonicalName();
+        Brave brave = null;
+        String spanName;
         spanName = invocation.getMethodName();
 
         ClientRequestInterceptor clientRequestInterceptor;
