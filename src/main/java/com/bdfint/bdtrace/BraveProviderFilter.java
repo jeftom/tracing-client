@@ -8,7 +8,9 @@ import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcException;
 import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
+import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.function.AbstractDubboFilter;
+import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +32,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
     }
 
     @Override
-    public boolean preHandle(Invoker<?> invoker, Invocation invocation) {
+    public boolean preHandle(Invoker<?> invoker, Invocation invocation, String serviceName, String spanName, Brave brave) {
         logger.debug(serviceName + " provider execute");
 
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
@@ -40,13 +42,13 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         if (spanId == null)// sample is 0 or null
             return true;
         setParentServiceName(serviceName, spanId);
-        serverRequestInterceptor.handle(dubboServerRequestAdapter);
+        brave.serverRequestInterceptor().handle(dubboServerRequestAdapter);
 
         return false;
     }
 
     @Override
-    public void afterHandle(Invocation invocation) {
-        serverResponseInterceptor.handle(new DubboServerResponseAdapter(status, exception, annotated.sr()));
+    public void afterHandle(Invocation invocation, StatusEnum status, Throwable exception, Brave brave) {
+        brave.serverResponseInterceptor().handle(new DubboServerResponseAdapter(status, exception, annotated.sr()));
     }
 }

@@ -2,14 +2,14 @@ package com.bdfint.bdtrace.function;
 
 import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.bean.LocalSpanId;
-import com.bdfint.bdtrace.bean.SamplerResult;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
 import com.bdfint.bdtrace.functionable.ServerTraceIgnoredBehaviors;
 import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
-import com.github.kristofa.brave.*;
+import com.github.kristofa.brave.Brave;
+import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,43 +19,44 @@ import org.slf4j.LoggerFactory;
  * @desriptioin
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
-    protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
+    protected final static ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
     //for sampler
-    static AbstractSamplerConfigReader[] readers = {
+    final static AbstractSamplerConfigReader[] readers = {
             new MethodSamplerConfigReader(),
             new ServiceSamplerConfigReader(),
             new GroupSamplerConfigReader(),
             new ApplicationSamplerConfigReader(),
             new GlobalSamplerConfigReader()
     };
-    static ReaderChain chain = new SamplerConfigReaderChain();
-    // brave and interceptors
-    protected volatile Brave brave = null;
-    protected volatile ClientRequestInterceptor clientRequestInterceptor;
-    protected volatile ClientResponseInterceptor clientResponseInterceptor;
-    protected volatile ServerRequestInterceptor serverRequestInterceptor;
-    protected volatile ServerResponseInterceptor serverResponseInterceptor;
-    // interface dependencies and impl.
-    protected volatile AnnotatedImpl annotated = new AnnotatedImpl();
-    protected volatile ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
-    protected volatile ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
-    protected volatile ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
-    //field
-    protected volatile StatusEnum status = StatusEnum.OK;
-    protected volatile String serviceName;
-    protected volatile String spanName;
-    protected volatile Throwable exception;
-    SamplerResult samplerResult = new SamplerResult();
+    final static ReaderChain chain = new SamplerConfigReaderChain();
+    private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
 
-    public AbstractDubboFilter() {
+    static {
         chain.addReaders(readers);
     }
 
+    // brave and interceptors
+//    protected ClientRequestInterceptor clientRequestInterceptor;
+//    protected ClientResponseInterceptor clientResponseInterceptor;
+//    protected ServerRequestInterceptor serverRequestInterceptor;
+//    protected ServerResponseInterceptor serverResponseInterceptor;
+    // interface dependencies and impl.
+
+    //不依赖于初始化参数，是无状态的类
+    protected AnnotatedImpl annotated = new AnnotatedImpl();
+    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
+    protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
+    //field
+//    protected StatusEnum status = StatusEnum.OK;
+//    protected String spanName;
+//    protected Throwable exception;
+//    SamplerResult samplerResult = new SamplerResult();
+    protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
+
     @Override
     public void initField(Invoker<?> invoker, Invocation invocation) {
-        serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
-        spanName = serviceInfoProvidable.spanName(invoker, invocation);
+        String serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
+        String spanName = serviceInfoProvidable.spanName(invoker, invocation);
         setInterceptors(serviceName);
 //        Test.testServiceName(serviceName);
     }
@@ -90,23 +91,30 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 //            return invoker.invoke(invocation);
 
         //template method
-        initField(invoker, invocation);
+//        initField(invoker, invocation);
+        Brave brave = null;
+        String serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
+        String spanName = serviceInfoProvidable.spanName(invoker, invocation);
+        brave = setInterceptors(serviceName);
+
 
         //template method
-        if (preHandle(invoker, invocation)) {
+        if (preHandle(invoker, invocation, serviceName, spanName, brave)) {
             return invoker.invoke(invocation);
         }
 
         //invoke
         Result result = null;
+        Throwable exception = null;
+        StatusEnum status = StatusEnum.OK;
         try {
             result = invoker.invoke(invocation);
-            exception = handleAndGetException(result, serviceName); //template method
+            exception = handleAndGetException(result, serviceName, status); //template method
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
             exception = e;
         } finally {
-            afterHandle(invocation);//template method
+            afterHandle(invocation, status, exception, brave);//template method
             return result;
         }
     }
@@ -126,24 +134,22 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
     }
 
-    protected void setInterceptors(String serviceName) {
+    protected Brave setInterceptors(String serviceName) {
+        Brave brave = null;
         if ((brave = BraveFactory.nullableInstance(serviceName)) == null) {//理论上不会为空
-            return;
+            return brave;
         }
-
-        this.clientRequestInterceptor = brave.clientRequestInterceptor();
-        this.clientResponseInterceptor = brave.clientResponseInterceptor();
-        this.serverRequestInterceptor = brave.serverRequestInterceptor();
-        this.serverResponseInterceptor = brave.serverResponseInterceptor();
+        return brave;
     }
 
     /**
      * 处理remote method内部异常
      *
      * @param result
+     * @param status
      * @return
      */
-    public Throwable handleAndGetException(Result result, String serviceName) {
+    public Throwable handleAndGetException(Result result, String serviceName, StatusEnum status) {
         if (result.hasException()) {
             status = StatusEnum.ERROR;
             logger.error("======================远程方法系统异常=====================");
