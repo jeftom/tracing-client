@@ -24,7 +24,8 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
      * CACHE for parent service
      */
     protected static volatile Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
-    private static int sInternal = 3 * 60 * 1000; // unit is ms
+    private static int ttl = 3 * 60 * 1000; // unit is ms
+    private static final int CLEAR_INTERNAL = 1000; // unit is ms
 
     public ParentServiceNameMapCacheProcessor() {
         clearTask();
@@ -49,9 +50,9 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
             return null;
         }
 
-        if (System.currentTimeMillis() - localSpanId.getTime() > sInternal) {
+        if (System.currentTimeMillis() - localSpanId.getTime() > ttl) {
             logger.warn("设置的缓存清理时间过小，请重新设置");
-            sInternal += 1000;
+            ttl += 1000;
         }
 
 //            Test.testForParentChildrenRelationship(parentSpanServiceName, serviceName);
@@ -70,7 +71,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
             LocalSpanId value = entry.getValue();
             long elapse = System.currentTimeMillis() - value.getTime();
             logger.debug("缓存@{} 已生存 {} ms", value.getParentSpanId(), elapse);
-            if (elapse >= sInternal) {
+            if (elapse >= ttl) {
                 spanIdMap.remove(entry.getKey());
                 logger.debug("缓存 {} has been clear,缓存容量 {}", value.getParentSpanId(), CACHE.size());
                 hasEntryRemoved = true;
@@ -90,6 +91,6 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
             public void run() {
                 clearCache();
             }
-        }, sInternal, sInternal, TimeUnit.MILLISECONDS);
+        }, ttl, CLEAR_INTERNAL, TimeUnit.MILLISECONDS);
     }
 }
