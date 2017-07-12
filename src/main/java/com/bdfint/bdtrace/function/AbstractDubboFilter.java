@@ -20,20 +20,20 @@ import org.slf4j.LoggerFactory;
  * @desriptioin
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
-    protected final static ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
+    protected final static ParentServiceNameMapCacheProcessor CACHE_PROCESSOR = new ParentServiceNameMapCacheProcessor();
     //for sampler
-    private final static AbstractSamplerConfigReader[] readers = {
+    private final static AbstractSamplerConfigReader[] READERS = {
             new MethodSamplerConfigReader(),
             new ServiceSamplerConfigReader(),
             new GroupSamplerConfigReader(),
             new ApplicationSamplerConfigReader(),
             new GlobalSamplerConfigReader()
     };
-    private final static ReaderChain chain = new SamplerConfigReaderChain();
+    private final static ReaderChain CHAIN = new SamplerConfigReaderChain();
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
 
     static {
-        chain.addReaders(readers);
+        CHAIN.addReaders(READERS);
     }
 
     //不依赖于初始化参数，是无状态的类
@@ -62,14 +62,14 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         logger.debug("当前的dubbo filter hashcode={}", this);
 //
 //        //采样处理
-//        chain.reset();
-//        readers[0].setInterface(samplerInfoProvider.methodName(invoker, invocation));
-//        readers[1].setInterface(samplerInfoProvider.uniqueInterfaceKey(invoker, invocation));
-//        readers[2].setInterface(samplerInfoProvider.group());
-//        readers[3].setInterface(samplerInfoProvider.applicationName());
-//        readers[4].setInterface(DubboTraceConst.GLOBAL_SAMPLER_KEY);
+//        CHAIN.reset();
+//        READERS[0].setInterface(samplerInfoProvider.methodName(invoker, invocation));
+//        READERS[1].setInterface(samplerInfoProvider.uniqueInterfaceKey(invoker, invocation));
+//        READERS[2].setInterface(samplerInfoProvider.group());
+//        READERS[3].setInterface(samplerInfoProvider.applicationName());
+//        READERS[4].setInterface(DubboTraceConst.GLOBAL_SAMPLER_KEY);
 //
-//        chain.readForAll(samplerResult);
+//        CHAIN.readForAll(samplerResult);
 //        if (!samplerResult.isSampled()) {
 //            return invoker.invoke(invocation);
 //        }
@@ -92,7 +92,8 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         brave(serviceName, bravePack);
 
         //template method
-        if (bravePack.brave == null || preHandle(invoker, invocation, serviceName, spanName, bravePack)) {
+        if (bravePack.brave == null
+                || preHandle(invoker, invocation, serviceName, spanName, bravePack)) {
             return invoker.invoke(invocation);
         }
 
@@ -109,17 +110,18 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         }
     }
 
-    protected void setParentServiceName(String serviceName, SpanId spanId) {
-        cacheProcessor.setParentServiceName(serviceName, spanId);
+    protected void setParentServiceName(String serviceName, SpanId spanId, Brave brave) {
+        CACHE_PROCESSOR.setParentServiceName(serviceName, spanId, brave);
     }
 
     protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId, BravePack bravePack) {
-        LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
+        LocalSpanId localSpanId = CACHE_PROCESSOR.getParentLocalSpanId(spanId);
 
         //if there is no CACHE
         if (localSpanId != null) {
-            String parentSpanServiceName = localSpanId.getParentSpanServiceName();
-            brave(parentSpanServiceName, bravePack);
+//            String parentSpanServiceName = localSpanId.getParentSpanServiceName();
+//            brave(parentSpanServiceName, bravePack);
+            bravePack.brave = localSpanId.getBrave();
         }
 
     }

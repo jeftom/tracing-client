@@ -1,5 +1,6 @@
 package com.bdfint.bdtrace.bean;
 
+import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 
 /**
@@ -9,6 +10,7 @@ import com.github.kristofa.brave.SpanId;
  */
 public class LocalSpanId {
 
+    private Brave brave;
     private SpanId parentSpanId;
     private String parentSpanName;
     private String parentSpanServiceName;
@@ -21,6 +23,15 @@ public class LocalSpanId {
         this.parentSpanServiceName = parentSpanServiceName;
         this.currentThread = currentThread;
         time = System.currentTimeMillis();
+    }
+
+    public Brave getBrave() {
+        return brave;
+    }
+
+    public LocalSpanId setBrave(Brave brave) {
+        this.brave = brave;
+        return this;
     }
 
     public Thread getCurrentThread() {

@@ -2,6 +2,8 @@ package com.bdfint.bdtrace.function;
 
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
+import com.bdfint.bdtrace.util.Configuration;
+import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +22,14 @@ import java.util.concurrent.TimeUnit;
 public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCacheProcessing {
     private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
+    private static final int CLEAR_INTERNAL = 1000; // unit is ms
+    private static final int CAPACITY = Integer.parseInt(Configuration.getProperty("service.name.cache.capacity"));
     /**
      * CACHE for parent service
      */
     protected static volatile Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
     private static int ttl = 3 * 60 * 1000; // unit is ms
-    private static final int CLEAR_INTERNAL = 1000; // unit is ms
+
 
     public ParentServiceNameMapCacheProcessor() {
         clearTask();
@@ -36,8 +40,8 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
     }
 
     @Override
-    public void setParentServiceName(String serviceName, SpanId spanId) {
-        CACHE.put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()));
+    public void setParentServiceName(String serviceName, SpanId spanId, Brave brave) {
+        CACHE.put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()).setBrave(brave));
         logger.debug("缓存设置成功，spanId is {},serviceName is {},缓存容量 {}", spanId.spanId, serviceName, CACHE.size());
     }
 

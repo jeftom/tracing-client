@@ -16,7 +16,7 @@ import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Activate(group = {Constants.PROVIDER})
+@Activate(group = Constants.PROVIDER)
 public class BraveProviderFilter extends AbstractDubboFilter {
     private static final Logger logger = LoggerFactory.getLogger(BraveProviderFilter.class);
 
@@ -26,7 +26,6 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         try {
             result = super.invoke(invoker, invocation);
         } catch (RpcException e) {
-            result = invoker.invoke(invocation);
             logger.error("RPC Provider 端异常，忽略本次追踪。", e);
         }
         return result;
@@ -42,7 +41,7 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
         if (spanId == null)// sample is 0 or null
             return true;
-        setParentServiceName(serviceName, spanId);
+        setParentServiceName(serviceName, spanId, bravePack.brave);
         bravePack.brave.serverRequestInterceptor().handle(dubboServerRequestAdapter);
 
         return false;

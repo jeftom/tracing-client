@@ -2,6 +2,7 @@ package com.bdfint.bdtrace.function;
 
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
+import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class ParentServiceNameThreadLocalCacheProcessor implements ParentService
     }
 
     @Override
-    public void setParentServiceName(String serviceName, SpanId spanId) {
+    public void setParentServiceName(String serviceName, SpanId spanId, Brave brave) {
         CACHE.get().put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()));
     }
 

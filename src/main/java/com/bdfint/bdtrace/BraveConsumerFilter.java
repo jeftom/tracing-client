@@ -2,10 +2,7 @@ package com.bdfint.bdtrace;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.Invocation;
-import com.alibaba.dubbo.rpc.Invoker;
-import com.alibaba.dubbo.rpc.Result;
-import com.alibaba.dubbo.rpc.RpcException;
+import com.alibaba.dubbo.rpc.*;
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.bean.BravePack;
@@ -20,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 
-@Activate(group = {Constants.CONSUMER})
+@Activate(group = Constants.CONSUMER)
 public class BraveConsumerFilter extends AbstractDubboFilter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
 
@@ -30,7 +27,6 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
         try {
             result = super.invoke(invoker, invocation);
         } catch (RpcException e) {
-            result = invoker.invoke(invocation);
             logger.error("RPC Consumer 端异常，忽略本次追踪。", e);
         }
         return result;

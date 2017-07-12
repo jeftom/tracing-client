@@ -3,6 +3,7 @@ package bdtrace.function;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.function.ParentServiceNameMapCacheProcessor;
 import com.bdfint.bdtrace.function.ParentServiceNameThreadLocalCacheProcessor;
+import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 import org.junit.After;
 import org.junit.Assert;
@@ -42,20 +43,21 @@ public class ParentServiceNameCacheProcessorTest {
 //        }, sInternal, sInternal, TimeUnit.MILLISECONDS);
 //        test.testGetParentLocalSpanId();
 
+        Brave brave = null;
         new Thread(() -> {
-            processor.setParentServiceName("1", SpanId.builder().traceId(1).spanId(1).build());
+            processor.setParentServiceName("1", SpanId.builder().traceId(1).spanId(1).build(), brave);
         }).start();
         new Thread(() -> {
-            processor.setParentServiceName("5", SpanId.builder().traceId(1).spanId(5).parentId(3L).build());
+            processor.setParentServiceName("5", SpanId.builder().traceId(1).spanId(5).parentId(3L).build(), brave);
         }).start();
         new Thread(() -> {
-            processor.setParentServiceName("2", SpanId.builder().traceId(1).spanId(2).parentId(1L).build());
+            processor.setParentServiceName("2", SpanId.builder().traceId(1).spanId(2).parentId(1L).build(), brave);
         }).start();
         new Thread(() -> {
-            processor.setParentServiceName("3", SpanId.builder().traceId(1).spanId(3).parentId(1L).build());
+            processor.setParentServiceName("3", SpanId.builder().traceId(1).spanId(3).parentId(1L).build(), brave);
         }).start();
         new Thread(() -> {
-            processor.setParentServiceName("4", SpanId.builder().traceId(1).spanId(4).parentId(2L).build());
+            processor.setParentServiceName("4", SpanId.builder().traceId(1).spanId(4).parentId(2L).build(), brave);
         }).start();
     }
 
@@ -78,7 +80,8 @@ public class ParentServiceNameCacheProcessorTest {
                 @Override
                 public void run() {
                     System.out.println(uuid.get());
-                    processor.setParentServiceName(uuid.toString(), SpanId.builder().traceId(uuid.get()).spanId(uuid.get()).build());
+                    Brave brave = null;
+                    processor.setParentServiceName(uuid.toString(), SpanId.builder().traceId(uuid.get()).spanId(uuid.get()).build(), brave);
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
@@ -113,7 +116,8 @@ public class ParentServiceNameCacheProcessorTest {
 
     @Test
     public void testClearCache() {
-        processor.setParentServiceName("", SpanId.builder().spanId(1).traceId(1).build());
+        Brave brave = null;
+        processor.setParentServiceName("", SpanId.builder().spanId(1).traceId(1).build(), brave);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
