@@ -67,6 +67,16 @@ public class ParentServiceNameThreadLocalCacheProcessor implements ParentService
         }
     }
 
+    /**
+     * 清理缓存
+     *
+     * @return 是否有清理过缓存
+     */
+    @Override
+    public boolean hasEnoughSpace() {
+        return false;
+    }
+
     public boolean clearCache() {
         boolean hasEntryRemoved = false;
         Map<Long, LocalSpanId> localSpanIdMap = CACHE.get();
