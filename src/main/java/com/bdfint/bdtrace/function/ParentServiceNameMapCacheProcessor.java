@@ -68,6 +68,16 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
 
     }
 
+    /**
+     * 清理缓存
+     *
+     * @return 是否有清理过缓存
+     */
+    @Override
+    public boolean hasEnoughSpace() {
+        return CACHE.size() < CAPACITY;
+    }
+
     public boolean clearCache() {
         boolean hasEntryRemoved = false;
         Map<Long, LocalSpanId> spanIdMap = CACHE;

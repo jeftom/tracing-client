@@ -96,6 +96,10 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
                 || preHandle(invoker, invocation, serviceName, spanName, bravePack)) {
             return invoker.invoke(invocation);
         }
+        if (!CACHE_PROCESSOR.hasEnoughSpace()) {
+            logger.warn("缓存容量已达1000,停止tracing.");
+            return invoker.invoke(invocation);
+        }
 
         //invoke
         try {
