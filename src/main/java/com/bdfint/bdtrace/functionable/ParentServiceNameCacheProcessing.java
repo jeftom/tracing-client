@@ -28,7 +28,7 @@ public interface ParentServiceNameCacheProcessing {
      *
      * @return 是否有清理过缓存
      */
-//    static boolean clearCache();
+    boolean clearCache();
 
     boolean outOfSpace();
 }

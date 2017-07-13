@@ -50,5 +50,6 @@ public class BraveProviderFilter extends AbstractDubboFilter {
     @Override
     public void afterHandle(Invocation invocation, StatusEnum status, Throwable exception, Brave brave) {
         brave.serverResponseInterceptor().handle(new DubboServerResponseAdapter(status, exception, annotated.sr()));
+        CACHE_PROCESSOR.clearCache();
     }
 }

@@ -2,7 +2,10 @@ package com.bdfint.bdtrace;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.extension.Activate;
-import com.alibaba.dubbo.rpc.*;
+import com.alibaba.dubbo.rpc.Invocation;
+import com.alibaba.dubbo.rpc.Invoker;
+import com.alibaba.dubbo.rpc.Result;
+import com.alibaba.dubbo.rpc.RpcException;
 import com.bdfint.bdtrace.adapter.DubboClientRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.bean.BravePack;
@@ -61,11 +64,11 @@ public class BraveConsumerFilter extends AbstractDubboFilter {
 
         DubboClientRequestAdapter clientRequestAdapter = new DubboClientRequestAdapter(invocation.getAttachments(), spanName, serviceName);
         // 获取到
-        SpanId spanId = newNullableSpanId(clientRequestAdapter, bravePack.brave);
-        if (spanId == null)
-            return true;
-        if (spanId.nullableParentId() != null)
-            getParentServiceNameAndSetBrave(serviceName, spanId, bravePack);
+//        SpanId spanId = newNullableSpanId(clientRequestAdapter, bravePack.brave);
+//        if (spanId == null)
+//            return true;
+//        if (spanId.nullableParentId() != null)
+        getParentServiceNameAndSetBrave(serviceName, null, bravePack);
 
         //clientRequestInterceptor has changed to parent service name brave.clientRequestInterceptor
         bravePack.brave.clientRequestInterceptor().handle(clientRequestAdapter);

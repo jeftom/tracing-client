@@ -7,6 +7,7 @@ import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
 import com.bdfint.bdtrace.functionable.FilterTemplate;
+import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
 import com.bdfint.bdtrace.functionable.ServerTraceIgnoredBehaviors;
 import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
 import com.github.kristofa.brave.Brave;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @desriptioin
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
-    protected final static ParentServiceNameMapCacheProcessor CACHE_PROCESSOR = new ParentServiceNameMapCacheProcessor();
+    protected final static ParentServiceNameCacheProcessing CACHE_PROCESSOR = new ParentServiceNameThreadLocalCacheProcessor();
     static final Exception EXCEPTION = new IllegalStateException("不知道发生了什么");
     //for sampler
     private final static AbstractSamplerConfigReader[] READERS = {
@@ -97,10 +98,10 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
                 || preHandle(invoker, invocation, serviceName, spanName, bravePack)) {
             return invoker.invoke(invocation);
         }
-        if (!CACHE_PROCESSOR.outOfSpace()) {
-            logger.warn("缓存容量已达1000,停止tracing.");
-            return invoker.invoke(invocation);
-        }
+//        if (!CACHE_PROCESSOR.outOfSpace()) {
+//            logger.warn("缓存容量已达1000,停止tracing.");
+//            return invoker.invoke(invocation);
+//        }
 
         //invoke
         try {
@@ -124,11 +125,10 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 
         //if there is no CACHE
         if (localSpanId != null) {
-//            String parentSpanServiceName = localSpanId.getParentSpanServiceName();
-//            brave(parentSpanServiceName, bravePack);
-            bravePack.brave = localSpanId.getBrave();
+            String parentSpanServiceName = localSpanId.getParentSpanServiceName();
+            brave(parentSpanServiceName, bravePack);
+//            bravePack.brave = localSpanId.getBrave();
         }
-
     }
 
     protected Brave brave(String serviceName, BravePack bravePack) {
