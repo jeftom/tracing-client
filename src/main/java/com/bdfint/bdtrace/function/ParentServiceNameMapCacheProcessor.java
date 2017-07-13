@@ -2,6 +2,7 @@ package com.bdfint.bdtrace.function;
 
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
+import com.bdfint.bdtrace.test.Test;
 import com.bdfint.bdtrace.util.Configuration;
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
@@ -54,7 +55,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
     }
 
     @Override
-    public LocalSpanId getParentLocalSpanId(SpanId spanId) {
+    public LocalSpanId getParentLocalSpanId(SpanId spanId, String currServiceName) {
         LocalSpanId localSpanId = CACHE.get(spanId.parentId);//获取父节点缓存，为了使当前节点接收父节点的依赖
         if (localSpanId == null) {
             if (spanId.nullableParentId() != null) // 当不是根节点时，consumer端应该获取到父节点的缓存
@@ -71,7 +72,8 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         if (localSpanId == null)
             logger.error("ERROR CACHE get null object. which means no CACHE set but try to get.");
 
-        logger.debug("获取缓存 {}", spanId.parentId);
+        Test.testForParentChildrenRelationship(localSpanId.getParentSpanServiceName(), currServiceName, logger);
+        logger.debug("获取缓存 {}, parent serviceName is {}, current serviceName is {}", spanId.parentId, localSpanId.getParentSpanServiceName(), currServiceName);
         return localSpanId;
 
     }
@@ -82,7 +84,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
      * @return 是否有清理过缓存
      */
     @Override
-    public boolean hasEnoughSpace() {
+    public boolean outOfSpace() {
         return CACHE.size() < CAPACITY;
     }
 

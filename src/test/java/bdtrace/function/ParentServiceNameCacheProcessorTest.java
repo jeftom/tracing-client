@@ -106,7 +106,7 @@ public class ParentServiceNameCacheProcessorTest {
             System.out.println(uuid.incrementAndGet());
             System.out.println(uuid.get());
             System.out.println(ParentServiceNameThreadLocalCacheProcessor.getCache().get().get(i));
-            LocalSpanId spanId = processor.getParentLocalSpanId(SpanId.builder().spanId(Long.valueOf(i)).parentId(Long.valueOf(i)).build());
+            LocalSpanId spanId = processor.getParentLocalSpanId(SpanId.builder().spanId(Long.valueOf(i)).parentId(Long.valueOf(i)).build(), "");
             if (spanId == null) continue;
             Assert.assertNull((spanId.getParentSpanId().parentId));
             Assert.assertEquals(ofNullable(spanId.getParentSpanId().spanId), Long.valueOf(i));

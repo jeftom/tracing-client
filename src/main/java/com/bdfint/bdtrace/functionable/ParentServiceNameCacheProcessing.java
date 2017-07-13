@@ -17,9 +17,10 @@ public interface ParentServiceNameCacheProcessing {
      * use spanId.spanId as key to get CACHE
      *
      * @param spanId
+     * @param currServiceName
      * @return
      */
-    LocalSpanId getParentLocalSpanId(SpanId spanId);
+    LocalSpanId getParentLocalSpanId(SpanId spanId, String currServiceName);
 
 
     /**
@@ -29,5 +30,5 @@ public interface ParentServiceNameCacheProcessing {
      */
 //    static boolean clearCache();
 
-    boolean hasEnoughSpace();
+    boolean outOfSpace();
 }

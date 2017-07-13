@@ -17,12 +17,12 @@ public class Test {
     private static Set<Entry> relationship = new HashSet<Entry>();
 
     static {
-        relationship.add(new Entry("Buy.buy", "BuyA.buyA"));
-        relationship.add(new Entry("Buy.buy", "BuyB.buyB"));
-        relationship.add(new Entry("BuyA.buyA", "BuyAA.buyAA"));
-        relationship.add(new Entry("BuyA.buyA", "BuyAB.buyAB"));
-        relationship.add(new Entry("BuyAB.buyAB", "BuyABA.buyAB"));
-        relationship.add(new Entry("BuyAB.buyAB", "BuyABB.buyAB"));
+        relationship.add(new Entry("com.bdfint.bdtrace.service.Buy", "com.bdfint.bdtrace.service.BuyA"));
+        relationship.add(new Entry("com.bdfint.bdtrace.service.Buy", "com.bdfint.bdtrace.service.BuyB"));
+        relationship.add(new Entry("com.bdfint.bdtrace.service.BuyA", "com.bdfint.bdtrace.service.BuyAA"));
+        relationship.add(new Entry("com.bdfint.bdtrace.service.BuyA", "com.bdfint.bdtrace.service.BuyAB"));
+        relationship.add(new Entry("com.bdfint.bdtrace.service.BuyAB", "com.bdfint.bdtrace.service.BuyABA"));
+        relationship.add(new Entry("com.bdfint.bdtrace.service.BuyAB", "com.bdfint.bdtrace.service.BuyABB"));
     }
 
     public static void testForParentChildrenRelationship(String parent, String child, Logger logger) {

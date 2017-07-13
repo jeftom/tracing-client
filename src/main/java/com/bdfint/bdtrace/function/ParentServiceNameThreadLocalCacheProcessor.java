@@ -46,7 +46,7 @@ public class ParentServiceNameThreadLocalCacheProcessor implements ParentService
     }
 
     @Override
-    public LocalSpanId getParentLocalSpanId(SpanId spanId) {
+    public LocalSpanId getParentLocalSpanId(SpanId spanId, String currServiceName) {
         if (CACHE.get().size() == 0) {
             if (spanId.nullableParentId() != null) // 当不是根节点时，consumer端应该获取到父节点的缓存
                 logger.error("ERROR when get parent service name");
@@ -73,7 +73,7 @@ public class ParentServiceNameThreadLocalCacheProcessor implements ParentService
      * @return 是否有清理过缓存
      */
     @Override
-    public boolean hasEnoughSpace() {
+    public boolean outOfSpace() {
         return false;
     }
 

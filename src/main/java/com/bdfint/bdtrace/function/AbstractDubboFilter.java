@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected final static ParentServiceNameMapCacheProcessor CACHE_PROCESSOR = new ParentServiceNameMapCacheProcessor();
+    static final Exception EXCEPTION = new IllegalStateException("不知道发生了什么");
     //for sampler
     private final static AbstractSamplerConfigReader[] READERS = {
             new MethodSamplerConfigReader(),
@@ -79,7 +80,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
 //            return invoker.invoke(invocation);
 
         BravePack bravePack = new BravePack();
-        Result result = null;
+        Result result = new RpcResult(EXCEPTION);
         Throwable exception = null;
         StatusEnum status = StatusEnum.OK;
         String serviceName;
@@ -89,14 +90,14 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         //initField(invoker, invocation);
         serviceName = serviceInfoProvidable.serviceName(invoker, invocation);
         spanName = serviceInfoProvidable.spanName(invoker, invocation);
-        brave(serviceName, bravePack);
+        brave(serviceName, bravePack);//set brave in bravePack
 
         //template method
         if (bravePack.brave == null
                 || preHandle(invoker, invocation, serviceName, spanName, bravePack)) {
             return invoker.invoke(invocation);
         }
-        if (!CACHE_PROCESSOR.hasEnoughSpace()) {
+        if (!CACHE_PROCESSOR.outOfSpace()) {
             logger.warn("缓存容量已达1000,停止tracing.");
             return invoker.invoke(invocation);
         }
@@ -119,7 +120,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     }
 
     protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId, BravePack bravePack) {
-        LocalSpanId localSpanId = CACHE_PROCESSOR.getParentLocalSpanId(spanId);
+        LocalSpanId localSpanId = CACHE_PROCESSOR.getParentLocalSpanId(spanId, serviceName);
 
         //if there is no CACHE
         if (localSpanId != null) {
