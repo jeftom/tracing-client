@@ -23,12 +23,20 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
     private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameMapCacheProcessor.class);
     private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
     private static final int CLEAR_INTERNAL = 1000; // unit is ms
-    private static final int CAPACITY = Integer.parseInt(Configuration.getProperty("service.name.cache.capacity"));
     /**
      * CACHE for parent service
      */
     protected static volatile Map<Long, LocalSpanId> CACHE = new ConcurrentHashMap<>();
+    private static int CAPACITY;
     private static int ttl = 3 * 60 * 1000; // unit is ms
+
+    static {
+        try {
+            CAPACITY = Integer.parseInt(Configuration.getProperty("servicenamecachecapacity"));
+        } catch (NumberFormatException e) {
+            CAPACITY = 1000;
+        }
+    }
 
 
     public ParentServiceNameMapCacheProcessor() {
@@ -100,11 +108,8 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
      * 定时清理,一旦new一个当前对象则有一个单线程的线程池被修改，重新执行任务
      */
     public void clearTask() {
-        SERVICE.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                clearCache();
-            }
+        SERVICE.scheduleAtFixedRate(() -> {
+            clearCache();
         }, ttl, CLEAR_INTERNAL, TimeUnit.MILLISECONDS);
     }
 }

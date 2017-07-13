@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
  */
 public class BraveProviderFilterTest {
 
-    AbstractDubboFilter filter = new BraveProviderFilter();
+    AbstractDubboFilter filter ;
 
     @Before
     public void before() throws Exception {

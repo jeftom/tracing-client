@@ -32,6 +32,7 @@ public class ParentServiceNameCacheProcessorTest {
     //    @Test
 //    public void testtt() throws Exception {
     public static void main(String[] args) throws Exception {
+        ParentServiceNameMapCacheProcessor processor = new ParentServiceNameMapCacheProcessor();
 //        ParentServiceNameCacheProcessorTest test = new ParentServiceNameCacheProcessorTest();
 //        test.testSetParentServiceName();
 //        Thread.sleep(5000);
