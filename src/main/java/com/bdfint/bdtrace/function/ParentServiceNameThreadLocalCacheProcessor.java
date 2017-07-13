@@ -40,9 +40,12 @@ public class ParentServiceNameThreadLocalCacheProcessor implements ParentService
     @Override
     public LocalSpanId getParentLocalSpanId(SpanId spanId, String currServiceName) {
         if (CACHE.get() == null) {
-//            if (spanId.nullableParentId() != null) // 当不是根节点时，consumer端应该获取到父节点的缓存
-//                logger.error("ERROR when get parent service name");
-            return new LocalSpanId(null, null, "unknown", null);
+            if (spanId == null) // 当不是根节点时，consumer端应该获取到父节点的缓存
+                return new LocalSpanId(null, null, currServiceName, null);
+            else {
+                logger.error("ERROR when get parent service name");
+                return new LocalSpanId(null, null, "unknown", null);
+            }
         } else {
             String pServiceName = CACHE.get();//获取父节点缓存，为了使当前节点接收父节点的依赖
             return new LocalSpanId(null, null, pServiceName, null);
