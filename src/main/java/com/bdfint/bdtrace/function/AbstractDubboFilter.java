@@ -110,6 +110,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         } catch (RpcException e) {
             status = StatusEnum.ERROR;
             exception = e;
+            throw e;
         } finally {
             afterHandle(invocation, status, exception, bravePack.brave);//template method
             return result;
