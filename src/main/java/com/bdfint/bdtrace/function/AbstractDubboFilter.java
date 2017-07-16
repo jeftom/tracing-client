@@ -6,10 +6,9 @@ import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.chain.ReaderChain;
 import com.bdfint.bdtrace.chain.sampler.*;
-import com.bdfint.bdtrace.functionable.FilterTemplate;
-import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
-import com.bdfint.bdtrace.functionable.ServerTraceIgnoredBehaviors;
-import com.bdfint.bdtrace.functionable.ServiceInfoProvidable;
+import com.bdfint.bdtrace.functionable.*;
+import com.bdfint.bdtrace.metrics.SampleStat;
+import com.bdfint.bdtrace.metrics.SampleStatImplBuilder;
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
@@ -79,6 +78,9 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         //ignore this trace when sample is 0 or null
 //        if (noneTraceBehaviors.ignore(invoker, invocation))
 //            return invoker.invoke(invocation);
+
+        CurrentInterface currentInterface = new CurrentInterfaceTranfer();
+        SampleStat sampleStat = new SampleStatImplBuilder().createSampleStatImpl();
 
         BravePack bravePack = new BravePack();
         Result result = new RpcResult(EXCEPTION);
@@ -152,8 +154,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             logger.error("======================dubbo远程方法异常=====================");
             logger.error("serviceName: {}, class: {}", serviceName, this);
             logger.error("Exception info {}", result.getException());
-            logger.error("======================dubbo远程方法异常=====================");
-            logger.error("");
+            logger.error("======================End of dubbo远程方法异常=====================");
             return result.getException();
         }
         return null;

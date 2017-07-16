@@ -5,9 +5,7 @@ package com.bdfint.bdtrace.metrics;
  * @date 2017/7/14.
  * @desriptioin 针对每一个类型的统计
  */
-public interface SampleStat {
-
-    boolean isSamplingAsExpect();
+public interface SampleStat extends SamplerAssert {
 
     float getErrorRange();
 
@@ -42,4 +40,10 @@ public interface SampleStat {
      * @return
      */
     long calledTimes();
+
+
+    /**
+     * 设置当前的调用上下文，包括interface,sampler,isSampled
+     */
+    void setCurrentInterfaceContext();
 }
