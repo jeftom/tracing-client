@@ -42,7 +42,7 @@ public class AttachmentTransmission implements AttachmentTransmittable {
 
             }
         }
-        return TraceData.builder().build();
+        return TraceData.builder().sample(false).build();
     }
 
     @Override

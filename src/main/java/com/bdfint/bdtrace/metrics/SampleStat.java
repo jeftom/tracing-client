@@ -5,7 +5,7 @@ package com.bdfint.bdtrace.metrics;
  * @date 2017/7/14.
  * @desriptioin 针对每一个类型的统计
  */
-public interface Stat {
+public interface SampleStat {
 
     boolean isSamplingAsExpect();
 
@@ -18,7 +18,7 @@ public interface Stat {
      *
      * @return
      */
-    Float getSampler();
+    float getSampler();
 
     void reset();
 

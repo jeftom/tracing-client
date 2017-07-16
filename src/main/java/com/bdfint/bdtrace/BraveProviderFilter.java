@@ -12,7 +12,6 @@ import com.bdfint.bdtrace.bean.BravePack;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.function.AbstractDubboFilter;
 import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +37,10 @@ public class BraveProviderFilter extends AbstractDubboFilter {
         DubboServerRequestAdapter dubboServerRequestAdapter = new DubboServerRequestAdapter(invocation.getAttachments(), spanName);
 
         annotated.serverReceived(serviceName, dubboServerRequestAdapter);
-        SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
-        if (spanId == null)// sample is 0 or null
-            return true;
-        setParentServiceName(serviceName, spanId, bravePack.brave);
+//        SpanId spanId = dubboServerRequestAdapter.getTraceData().getSpanId();
+//        if (spanId == null)// sample is 0 or null
+//            return true;
+        setParentServiceName(serviceName, null, bravePack.brave);
         bravePack.brave.serverRequestInterceptor().handle(dubboServerRequestAdapter);
 
         return false;

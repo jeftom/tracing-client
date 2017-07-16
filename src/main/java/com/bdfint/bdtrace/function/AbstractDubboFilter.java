@@ -94,8 +94,8 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
         brave(serviceName, bravePack);//set brave in bravePack
 
         //template method
-        if (bravePack.brave == null
-                || preHandle(invoker, invocation, serviceName, spanName, bravePack)) {
+        preHandle(invoker, invocation, serviceName, spanName, bravePack);
+        if (bravePack.brave == null) {
             return invoker.invoke(invocation);
         }
 //        if (!CACHE_PROCESSOR.outOfSpace()) {
