@@ -2,6 +2,7 @@ package com.bdfint.bdtrace.function;
 
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
+import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +36,11 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         return CACHE;
     }
 
-    @Override
     public void setParentServiceName(String serviceName, SpanId spanId) {
         CACHE.put(spanId.spanId, new LocalSpanId(spanId, serviceName, serviceName, Thread.currentThread()));
         logger.debug("缓存设置成功，spanId is {},serviceName is {},缓存容量 {}", spanId.spanId, serviceName, CACHE.size());
     }
 
-    @Override
     public LocalSpanId getParentLocalSpanId(SpanId spanId) {
         LocalSpanId localSpanId = CACHE.get(spanId.parentId);//获取父节点缓存，为了使当前节点接收父节点的依赖
         if (localSpanId == null) {
@@ -64,6 +63,23 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
 
     }
 
+    @Override
+    public void setParentServiceName(String serviceName, SpanId spanId, Brave brave) {
+
+    }
+
+    /**
+     * use spanId.spanId as key to get CACHE
+     *
+     * @param spanId
+     * @param currServiceName
+     * @return
+     */
+    @Override
+    public LocalSpanId getParentLocalSpanId(SpanId spanId, String currServiceName) {
+        return null;
+    }
+
     public boolean clearCache() {
         boolean hasEntryRemoved = false;
         Map<Long, LocalSpanId> spanIdMap = CACHE;
@@ -79,6 +95,11 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         }
 
         return hasEntryRemoved;
+    }
+
+    @Override
+    public boolean outOfSpace() {
+        return false;
     }
 
 

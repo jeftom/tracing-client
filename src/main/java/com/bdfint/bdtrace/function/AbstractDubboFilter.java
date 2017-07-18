@@ -26,29 +26,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     private static final Logger logger = LoggerFactory.getLogger(AbstractDubboFilter.class);
-    private static AtomicLong threadName = new AtomicLong(0);
-    // brave and interceptors
-    protected Brave brave = null;
-    protected ClientRequestInterceptor clientRequestInterceptor;
-    protected ClientResponseInterceptor clientResponseInterceptor;
-    protected ServerRequestInterceptor serverRequestInterceptor;
-    protected ServerResponseInterceptor serverResponseInterceptor;
-
-    // interface dependencies and impl.
-    protected AnnotatedImpl annotated = new AnnotatedImpl();
-    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
-    protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
-    protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
-
-//    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
-    protected static ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
-
-    //field
-    protected StatusEnum status = StatusEnum.OK;
-    protected String serviceName;
-    protected String spanName;
-    protected Throwable exception;
-
+    //    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
+    protected static ParentServiceNameThreadLocalCacheProcessor cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
     //for sampler
     static AbstractSamplerConfigReader[] readers = {
             new MethodSamplerConfigReader(),
@@ -57,8 +36,25 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
             new ApplicationSamplerConfigReader(),
             new GlobalSamplerConfigReader()
     };
-    SamplerResult samplerResult = new SamplerResult();
     static ReaderChain chain = new SamplerConfigReaderChain();
+    private static AtomicLong threadName = new AtomicLong(0);
+    // brave and interceptors
+    protected Brave brave = null;
+    protected ClientRequestInterceptor clientRequestInterceptor;
+    protected ClientResponseInterceptor clientResponseInterceptor;
+    protected ServerRequestInterceptor serverRequestInterceptor;
+    protected ServerResponseInterceptor serverResponseInterceptor;
+    // interface dependencies and impl.
+    protected AnnotatedImpl annotated = new AnnotatedImpl();
+    protected ServerTraceIgnoredBehaviors noneTraceBehaviors = new NoneTraceBehaviorsImpl();
+    protected ServiceInfoProvidable serviceInfoProvidable = new ServiceInfoProvider();
+    protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
+    //field
+    protected StatusEnum status = StatusEnum.OK;
+    protected String serviceName;
+    protected String spanName;
+    protected Throwable exception;
+    SamplerResult samplerResult = new SamplerResult();
 
     public AbstractDubboFilter() {
         chain.addReaders(readers);
@@ -82,7 +78,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
      */
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {//build template
-        logger.debug("当前的dubbo filter hashcode={}",this);
+        logger.debug("当前的dubbo filter hashcode={}", this);
 //
 //        //采样处理
 //        chain.reset();
@@ -125,11 +121,11 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     }
 
     protected void setParentServiceName(String serviceName, SpanId spanId) {
-        cacheProcessor.setParentServiceName(serviceName, spanId);
+        cacheProcessor.setParentServiceName(serviceName, spanId, null);
     }
 
     protected void getParentServiceNameAndSetBrave(String serviceName, SpanId spanId) {
-        LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
+        LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId, null);
 
         //if there is no CACHE
         if (localSpanId != null) {
@@ -184,7 +180,6 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
                 Method spanId = ServerSpan.class.getDeclaredMethod("spanId");
                 spanId.setAccessible(true);
                 SpanId Id = ((SpanId) spanId.invoke(currentServerSpan));
-
 
 
             } catch (NoSuchMethodException e) {
