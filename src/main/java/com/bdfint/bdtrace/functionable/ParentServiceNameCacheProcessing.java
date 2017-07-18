@@ -1,6 +1,7 @@
 package com.bdfint.bdtrace.functionable;
 
 import com.bdfint.bdtrace.bean.LocalSpanId;
+import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.SpanId;
 
 /**
@@ -10,15 +11,16 @@ import com.github.kristofa.brave.SpanId;
  */
 public interface ParentServiceNameCacheProcessing {
 
-    void setParentServiceName(String serviceName, SpanId spanId);
+    void setParentServiceName(String serviceName, SpanId spanId, Brave brave);
 
     /**
      * use spanId.spanId as key to get CACHE
      *
      * @param spanId
+     * @param currServiceName
      * @return
      */
-    LocalSpanId getParentLocalSpanId(SpanId spanId);
+    LocalSpanId getParentLocalSpanId(SpanId spanId, String currServiceName);
 
 
     /**
@@ -27,4 +29,6 @@ public interface ParentServiceNameCacheProcessing {
      * @return 是否有清理过缓存
      */
     boolean clearCache();
+
+    boolean outOfSpace();
 }
