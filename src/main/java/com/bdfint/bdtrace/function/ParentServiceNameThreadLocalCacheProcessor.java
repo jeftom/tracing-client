@@ -7,9 +7,6 @@ import com.github.kristofa.brave.SpanId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 /**
  * @author heyb
  * @date 2017/5/26.
@@ -21,8 +18,6 @@ public class ParentServiceNameThreadLocalCacheProcessor implements ParentService
      */
     protected static final ThreadLocal<String> CACHE = new ThreadLocal<String>();
     private static final Logger logger = LoggerFactory.getLogger(ParentServiceNameThreadLocalCacheProcessor.class);
-    private static final ScheduledExecutorService SERVICE = Executors.newSingleThreadScheduledExecutor();
-    private static int sInternal = 3 * 1000; // unit is ms
 
     public ParentServiceNameThreadLocalCacheProcessor() {
         clearTask();
@@ -69,12 +64,5 @@ public class ParentServiceNameThreadLocalCacheProcessor implements ParentService
      * 定时清理,一旦new一个当前对象则有一个单线程的线程池被修改，重新执行任务
      */
     public void clearTask() {
-//        SERVICE.scheduleAtFixedRate(new Runnable() {
-//            @Override
-//            public void run() {
-//                System.out.println(System.currentTimeMillis());
-//                clearCache();
-//            }
-//        }, sInternal, sInternal, TimeUnit.MILLISECONDS);
     }
 }

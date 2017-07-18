@@ -7,7 +7,8 @@ import com.bdfint.bdtrace.adapter.DubboServerRequestAdapter;
 import com.bdfint.bdtrace.adapter.DubboServerResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.function.BraveFactory;
-import com.bdfint.bdtrace.function.ParentServiceNameMapCacheProcessor;
+import com.bdfint.bdtrace.function.ParentServiceNameThreadLocalCacheProcessor;
+import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
 import com.github.kristofa.brave.Brave;
 import com.github.kristofa.brave.ServerRequestInterceptor;
 import com.github.kristofa.brave.ServerResponseInterceptor;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 @Activate(group = {Constants.PROVIDER})
 public class BraveProviderFilter implements Filter {
-    protected static final ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
+    protected static ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
     private static final Logger logger = LoggerFactory.getLogger(BraveProviderFilter.class);
 
     @Override
@@ -49,6 +50,6 @@ public class BraveProviderFilter implements Filter {
     }
 
     protected void setParentServiceName(String serviceName, SpanId spanId) {
-        cacheProcessor.setParentServiceName(serviceName, spanId);
+        cacheProcessor.setParentServiceName(serviceName, spanId,null);
     }
 }

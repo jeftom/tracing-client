@@ -8,7 +8,8 @@ import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.bean.LocalSpanId;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.function.BraveFactory;
-import com.bdfint.bdtrace.function.ParentServiceNameMapCacheProcessor;
+import com.bdfint.bdtrace.function.ParentServiceNameThreadLocalCacheProcessor;
+import com.bdfint.bdtrace.functionable.ParentServiceNameCacheProcessing;
 import com.github.kristofa.brave.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ import java.lang.reflect.Field;
 @Activate(group = {Constants.CONSUMER})
 public class BraveConsumerFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
-    protected static ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
+    protected static ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
@@ -42,7 +43,7 @@ public class BraveConsumerFilter implements Filter {
         if (spanId == null)
             return invoker.invoke(invocation);
         if (spanId.nullableParentId() != null) {
-            LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId);
+            LocalSpanId localSpanId = cacheProcessor.getParentLocalSpanId(spanId, null);
 
             //if there is no CACHE
             if (localSpanId != null) {

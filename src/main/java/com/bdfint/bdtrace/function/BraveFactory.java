@@ -5,8 +5,10 @@ import com.bdfint.bdtrace.adapter.DubboClientResponseAdapter;
 import com.bdfint.bdtrace.bean.StatusEnum;
 import com.bdfint.bdtrace.functionable.GlobalSampler;
 import com.bdfint.bdtrace.util.Configuration;
-import com.github.kristofa.brave.*;
-import com.github.kristofa.brave.http.HttpSpanCollector;
+import com.github.kristofa.brave.Brave;
+import com.github.kristofa.brave.ClientRequestInterceptor;
+import com.github.kristofa.brave.ClientResponseInterceptor;
+import com.github.kristofa.brave.Sampler;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,7 +18,6 @@ import zipkin.reporter.Sender;
 import zipkin.reporter.okhttp3.OkHttpSender;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +35,6 @@ public class BraveFactory {
     //static
 //    private static AsyncReporter<zipkin.Span> sReporter = new BraveFactory().reporter;
 //    private static Sampler sSampler = new BraveFactory().sampler;
-    private final static LinkedHashMap<String, Brave> CACHE = new LinkedHashMap<>();
     private final static int MAX_SIZE = 20;
     //field
 //    private final Sender sender = OkHttpSender.create(Configuration.getZipkinUrl());
@@ -62,10 +62,7 @@ public class BraveFactory {
 
         Brave brave = null;
         try {
-            brave = new Brave.Builder(serviceName)
-                    .spanCollector(
-                            HttpSpanCollector.create("http://" + Configuration.getZipkinHost() + ":9411", new EmptySpanCollectorMetricsHandler()))
-                    .traceSampler(SAMPLER).build();
+            brave = new Brave.Builder(serviceName).reporter(REPORTER).traceSampler(sampler).build();
         } catch (Exception e) {
             logger.info("异常信息：", e);
         } finally {
