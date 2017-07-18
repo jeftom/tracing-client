@@ -89,6 +89,7 @@ public class ParentServiceNameMapCacheProcessor implements ParentServiceNameCach
         SERVICE.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
+                logger.debug("清理线程："+Thread.currentThread().toString());
                 clearCache();
             }
         }, ttl, CLEAR_INTERNAL, TimeUnit.MILLISECONDS);

@@ -41,7 +41,7 @@ public abstract class AbstractDubboFilter implements Filter, FilterTemplate {
     protected ServiceInfoProvidable samplerInfoProvider = new SamplerInfoProvider();
 
 //    protected ParentServiceNameCacheProcessing cacheProcessor = new ParentServiceNameThreadLocalCacheProcessor();
-    protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
+    protected static ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
 
     //field
     protected StatusEnum status = StatusEnum.OK;

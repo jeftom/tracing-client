@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 @Activate(group = {Constants.CONSUMER})
 public class BraveConsumerFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BraveConsumerFilter.class);
-    protected static volatile ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
+    protected static ParentServiceNameMapCacheProcessor cacheProcessor = new ParentServiceNameMapCacheProcessor();
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
